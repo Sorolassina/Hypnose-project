@@ -57,6 +57,57 @@ class App:
         btn_remove_file = tk.Button(root, text="Supprimer", command=self.remove_file, cursor="hand2",width=35)
         btn_remove_file.pack(pady=5)
 
+        self.basecloud_checkbox = tk.IntVar()
+        self.checkbox_basecloud = ttk.Checkbutton(root, text="Stockage cloud", cursor="hand2",variable=self.basecloud_checkbox, command=self.etat_modifie)
+        self.checkbox_basecloud.place(x=855,y=345)
+
+        self.baselocale_checkbox = tk.IntVar()
+        self.checkbox_baseclocale = ttk.Checkbutton(root, text="Stockage local", cursor="hand2",variable=self.baselocale_checkbox, command=self.etat_modifie)
+        self.checkbox_baseclocale.place(x=855,y=370)
+
+        self.docattente_checkbox = tk.IntVar()
+        self.checkbox_docattente = ttk.Checkbutton(root, text="Mettre en attente les documents stockés", cursor="hand2",variable=self.docattente_checkbox, command=self.etat_modifie2)
+        self.checkbox_docattente.place(x=1050,y=345)
+
+        self.docvalide_checkbox = tk.IntVar()
+        self.checkbox_docvalide = ttk.Checkbutton(root, text="Marquer ces documents comme certifiés", cursor="hand2",variable=self.docvalide_checkbox, command=self.etat_modifie2)
+        self.checkbox_docvalide.place(x=1050,y=370)
+
+    def etat_modifie(self):
+        # Fonction de rappel pour exécuter lorsque la case à cocher est cochée ou décochée
+        if self.basecloud_checkbox.get() == 1:           
+            self.checkbox_baseclocale.config(state="disabled")
+            self.checkbox_basecloud.config(state="normal")
+
+        elif self.baselocale_checkbox.get() == 1:   
+            self.checkbox_basecloud.config(state="disabled")
+            self.checkbox_baseclocale.config(state="normal")
+
+        else:
+            self.checkbox_baseclocale.config(state="normal")
+            self.checkbox_basecloud.config(state="normal")
+
+    def etat_modifie2(self):
+
+        if self.docattente_checkbox.get() == 1:
+            self.checkbox_docvalide.config(state="disabled")
+            self.checkbox_docattente.config(state="normal")
+
+        elif self.docvalide_checkbox.get() == 1:   
+            self.checkbox_docattente.config(state="disabled")
+            self.checkbox_docvalide.config(state="normal")
+
+        else:
+            self.checkbox_docvalide.config(state="normal")
+            self.checkbox_docattente.config(state="normal")
+            
+
+            
+            
+    
+    
+    
+    
     def load_to_database(self):
         # Connexion à la base de données MongoDB
         client = pymongo.MongoClient("mongodb://localhost:27017/")
