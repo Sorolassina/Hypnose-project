@@ -5,6 +5,9 @@ import datetime
 import PyPDF2
 import pymongo
 import os
+from tkinter import messagebox, simpledialog
+from langdetect import detect
+import fitz  # PyMuPDF
 
 class App:
     def __init__(self, root):
@@ -12,40 +15,83 @@ class App:
         self.root.title("Gestion des fichiers PDF")
         self.root.iconbitmap('logo2.ico')
 
-        self.window_width = 1300
-        self.window_height = 750
+        self.window_width = 1380
+        self.window_height = 450
         self.center_window()
-
-        self.tree = Treeview(root, columns=('Titre', 'Auteur', 'Sortie', 'Créé', 'Genre', 'Langue'))
-        self.tree.heading('#0', text='Nom du Fichier')
+       
+        self.tree = Treeview(root, columns=('Date', 'Titre', 'Auteur', 'Pages', 'Type', 'Langue','Contenu'))
+        self.tree.heading('#0', text='Chemin')
+        self.tree.heading('Date', text='Date')
         self.tree.heading('Titre', text='Titre')
         self.tree.heading('Auteur', text='Auteur')
-        self.tree.heading('Sortie', text='Sortie')
-        self.tree.heading('Créé', text='Créé')
-        self.tree.heading('Genre', text='Genre')
+        self.tree.heading('Pages', text='Pages')
+        self.tree.heading('Type', text='Type')
         self.tree.heading('Langue', text='Langue')
+        self.tree.heading('Contenu', text='Contenu')
+
         self.tree.pack(fill='both', expand=True)
 
+        self.tree.column("Date", width=70)
         self.tree.column("Titre", width=70)
         self.tree.column("Auteur", width=70)
-        self.tree.column("Sortie", width=70)
-        self.tree.column("Créé", width=70)
-        self.tree.column("Genre", width=70)
+        self.tree.column("Pages", width=70)
+        self.tree.column("Type", width=70)
         self.tree.column("Langue", width=70)
+        self.tree.column("Contenu", width=70)
         
-        btn_select_files = tk.Button(root, text="Sélectionner des fichiers", command=self.select_files)
+        btn_select_files = tk.Button(root, text="Sélectionner des fichiers", command=self.select_files, cursor="hand2")
         btn_select_files.pack(pady=10)
         
-        btn_process_files = tk.Button(root, text="Traiter les fichiers", command=self.process_files)
+        btn_process_files = tk.Button(root, text="Charger dans la base", command=self.process_files, cursor="hand2")
         btn_process_files.pack(pady=5)
         
     def select_files(self):
-        filenames = filedialog.askopenfilenames(filetypes=[("Fichiers PDF", "*.pdf")])
+        filenames = filedialog.askopenfilenames(filetypes=[("Fichiers PDF", "*.pdf"),("Fichiers PDF", "*.csv")])
         for filename in filenames:
-            self.tree.insert('', 'end', text=filename, values=('Non Renseigné', 'Non Renseigné', 'Non Renseigné', datetime.date.today(), 'Non Renseigné', 'Non Renseigné'))
+            Titre=filename.split("/")[-1] # On détermine le nom du document
+            Type=Titre.split(".")[-1] # On détermine le type de document
 
+            pdf_reader = PyPDF2.PdfReader(filename)
 
+            # On extrait le contenu du document
+            text = ""
+            Nbrepages=0
+            for page_num in range(len(pdf_reader.pages)):
+                page = pdf_reader.pages[page_num]
+                text += page.extract_text()
+                Nbrepages+=page_num+1
 
+            try: # On va déterminer ensuite la langue du documents
+                language = detect(text)
+            except:
+                language="Langue non détectée"
+
+            Auteur = self.extract_metadata(filename) #simpledialog.askstring(Titre, "Quel est l'auteur de ce livre ? :",parent=self.root)
+            Title = self.extract_metadata(filename)
+            
+            self.tree.insert('', 'end', text=filename, values=(datetime.date.today(), Title['Title'], Auteur['Author'], Nbrepages, Type, language,text))
+
+    def extract_metadata(self,file):
+        metadata = {}
+        pdf_document = fitz.open(file)
+        
+        metadata['Title'] = pdf_document.metadata.get('title', '')
+        metadata['Author'] = pdf_document.metadata.get('author', '')
+        metadata['Subject'] = pdf_document.metadata.get('subject', '')
+        metadata['Producer'] = pdf_document.metadata.get('producer', '')
+        metadata['CreationDate'] = pdf_document.metadata.get('creationDate', '')
+        metadata['ModificationDate'] = pdf_document.metadata.get('modDate', '')
+
+        pdf_document.close()
+
+        return metadata
+
+    def count_pdf_pages(pdf_file_path):
+        with open(pdf_file_path, 'rb') as file:
+            reader = PyPDF2.PdfReader(file)
+            return reader.numPages
+    
+    
     def process_files(self):
         for child in self.tree.get_children():
             title = self.tree.item(child, 'text')

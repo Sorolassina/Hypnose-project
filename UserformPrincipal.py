@@ -172,7 +172,8 @@ class UserF():
     def filter_tree(self,event=None):
         filter_text =  self.lookvalue_entry.get().lower()
         for item in self.tree.get_children():
-            if filter_text in self.tree.item(item)['text'].lower():
+            item_values = self.tree.item(item, 'values')
+            if any(filter_text in str(value).lower() for value in item_values):
                 self.tree.selection_add(item)
             else:
                 self.tree.selection_remove(item)

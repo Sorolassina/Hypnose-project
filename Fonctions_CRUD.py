@@ -54,7 +54,7 @@ def display_record(id, db_type,table):
         print("Type de base de données non pris en charge.")
 
 
-def charger_fichier(Base_type, Nom_base, collect=0):
+def charger_fichier(collect=0):
     # Connexion à la base de données MySQL
     conn = connectSQL()
     cursor = conn.cursor()
