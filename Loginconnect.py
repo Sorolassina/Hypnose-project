@@ -79,10 +79,6 @@ class Login ():
         textbox.delete(0, END)
         # Insérer le texte formaté dans le Entry
         textbox.insert(0, formatted_text)
-        
-    
-    
-    
     
     def validate_password(self, event):
         new_text = event.widget.get()
