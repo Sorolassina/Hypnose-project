@@ -143,16 +143,10 @@ class UserF():
         update_button = Button(Cadre_box, width=10,text="Enregistrer",font=myFontBouton, command="",cursor="hand2").place(x=15, y=375)
         delete_button = Button(Cadre_box, width=10,text="Supprimer",font=myFontBouton, command="",cursor="hand2").place(x=110, y=375)
         quit_button = Button(Cadre_bouton, width=20,text="Quitter",bg="red",foreground="white",font=myFontBouton, command="",cursor="hand2").place(x=8, y=450)
-        
-        #self.look_label = ttk.Label(Cadre_bouton, text="Rechercher par : ", font=myFontLabel,width=15,background="white")
-        #self.look_label.place(x=40, y=210)
-        #self.look_entry = ttk.Combobox(Cadre_bouton, background='#FFFFFF',state="readonly",width=24,height=25)
-        #self.look_entry["values"]=("id","Titre")
-        #self.look_entry.current(0)
-        #self.look_entry.place(x=8, y=250) 
 
         self.lookvalue_entry = ttk.Entry(zone1, background='#FFFFFF')
         self.lookvalue_entry.place(x=310, y=20,width=500,height=28) 
+        self.lookvalue_entry.bind("<KeyRelease>", self.filter_tree)
 
         look_button = Button(zone1, width=15,text="Rechercher",foreground="black",font=myFontBouton, command="",cursor="hand2")      
         look_button.place(x=825, y=20)  
@@ -174,7 +168,15 @@ class UserF():
             self.checkbox.configure(text="Documents validés")
             self.tree.delete(*self.tree.get_children())
             self.load_dataDV()
-            
+
+    def filter_tree(self,event=None):
+        filter_text =  self.lookvalue_entry.get().lower()
+        for item in self.tree.get_children():
+            if filter_text in self.tree.item(item)['text'].lower():
+                self.tree.selection_add(item)
+            else:
+                self.tree.selection_remove(item)
+
         # Définir une fonction pour gérer la sélection dans la Treeview
     def on_treeview_select(self,event):
         # Obtenez les ID des éléments sélectionnés
@@ -197,9 +199,8 @@ class UserF():
             # Affichez les valeurs récupérées
             self.de_entry.set_date(values[0])
             self.title_entry.insert(0,values[1])          
-            #self.de_entry.set_date(values[2])
             self.aut_entry.insert(0,values[2])
-            self.page_entry.set(values[3])
+            self.page_entry.insert(0,values[3])
             self.genre_entry.set(values[4])
             self.langue_entry.set(values[5])
 
@@ -207,7 +208,6 @@ class UserF():
             
             # Pour insérer la date du jour si aucun élément n'est sélectionné
             today = datetime.date.today()
-            self.ds_entry.set_date(today)
             self.de_entry.set_date(today)
 
             # Effacer les valeurs si aucun élément n'est sélectionné
