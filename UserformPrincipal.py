@@ -54,27 +54,27 @@ class UserF():
         yscroll.pack(side=RIGHT,fill=Y)
 
          # Création du Treeview avec 3 colonnes
-        self.tree = ttk.Treeview(Cadre_affichage, columns=("créé",'titre','auteur','nombre de page','genre','langue'),xscrollcommand=xscroll.set,yscrollcommand=yscroll.set)
+        self.tree = ttk.Treeview(Cadre_affichage, columns=("Date",'Titre','Auteur','Pages','Type','Langue'),xscrollcommand=xscroll.set,yscrollcommand=yscroll.set)
         
         # Définition des en-têtes de colonnes
         #self.tree.heading('id', text='Id')
-        self.tree.heading("créé", text="Créé le")
-        self.tree.heading('titre', text='Titre')
-        self.tree.heading('auteur', text='Auteur')      
-        self.tree.heading("nombre de page", text="Pages")
-        self.tree.heading("genre", text="Genre")
-        self.tree.heading("langue", text="Langue")
+        self.tree.heading("Date", text="Date")
+        self.tree.heading('Titre', text='Titre')
+        self.tree.heading('Auteur', text='Auteur')      
+        self.tree.heading("Pages", text="Pages")
+        self.tree.heading("Genre", text="Genre")
+        self.tree.heading("Langue", text="Langue")
         
         self.tree["show"]="headings"
 
         # Définition de la largeur des colonnes
         #self.tree.column('id',width=100)
-        self.tree.column("créé", width=70)
-        self.tree.column('titre', width=150)
-        self.tree.column('auteur', width=150)
-        self.tree.column("nombre de page", width=50)
-        self.tree.column("genre", width=150)
-        self.tree.column("langue", width=100)
+        self.tree.column("Date", width=70)
+        self.tree.column('Titre', width=150)
+        self.tree.column('Auteur', width=150)
+        self.tree.column("Pages", width=50)
+        self.tree.column("Genre", width=150)
+        self.tree.column("Langue", width=100)
         
         self.tree.pack(expand=True,fill='both')
         self.tree.bind("<ButtonRelease-1")
@@ -100,13 +100,13 @@ class UserF():
         self.aut_entry.place(x=15, y=105,width=200,height=25) 
   
             # Date enregistrement 
-        self.de_label = ttk.Label(Cadre_box, text="Date enregistrement", font=myFontLabel,width=20,background="white")
+        self.de_label = ttk.Label(Cadre_box, text="Date", font=myFontLabel,width=20,background="white")
         self.de_label.place(x=15, y=135)
         self.de_entry = DateEntry(Cadre_box, background='#FFFFFF')
         self.de_entry.place(x=15, y=165,width=200,height=25)
 
             # Nombre de page 
-        self.page_label = ttk.Label(Cadre_box, text="Nombre de page", font=myFontLabel,width=20,background="white")
+        self.page_label = ttk.Label(Cadre_box, text="Pages", font=myFontLabel,width=20,background="white")
         self.page_label.place(x=15, y=195)
         self.page_entry = Entry(Cadre_box, background='#FFFFFF')
         self.page_entry.place(x=15, y=225,width=200,height=25) 
@@ -138,7 +138,7 @@ class UserF():
         self.checkbox.place(x=8,y=20)
 
         #refresh_button = Button(Cadre_bouton, width=20,text="Actualiser",font=myFontBouton, command="",cursor="hand2").place(x=8, y=50)
-        create_button = Button(zone1, width=15,text="Charger un fichier",font=myFontBouton, command="",cursor="hand2")
+        create_button = Button(zone1, width=15,text="Charger fichiers",font=myFontBouton, command="",cursor="hand2")
         create_button.place(x=970, y=20)    
         update_button = Button(Cadre_box, width=10,text="Enregistrer",font=myFontBouton, command="",cursor="hand2").place(x=15, y=375)
         delete_button = Button(Cadre_box, width=10,text="Supprimer",font=myFontBouton, command="",cursor="hand2").place(x=110, y=375)

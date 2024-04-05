@@ -8,11 +8,12 @@ import os
 from tkinter import messagebox, simpledialog
 from langdetect import detect
 import fitz  # PyMuPDF
+from tkinter import ttk
 
 class App:
     def __init__(self, root):
         self.root = root
-        self.root.title("Gestion des fichiers PDF")
+        self.root.title("Hypnose Manager file")
         self.root.iconbitmap('logo2.ico')
 
         self.window_width = 1380
@@ -38,21 +39,93 @@ class App:
         self.tree.column("Type", width=70)
         self.tree.column("Langue", width=70)
         self.tree.column("Contenu", width=70)
+
+
+        # Création de la barre de progression avec une hauteur personnalisée en modifiant la taille de la police
+        self.titrebar_label = ttk.Label(root, text="", font=("Arial", 8),width=1380)
+        self.titrebar_label.pack(pady=5)
         
-        btn_select_files = tk.Button(root, text="Sélectionner des fichiers", command=self.select_files, cursor="hand2")
+        self.progress_bar = ttk.Progressbar(root, orient=tk.HORIZONTAL, length=1380, mode='determinate')
+        self.progress_bar.pack(pady=5)
+        
+        btn_select_files = tk.Button(root, text="Sélectionner des fichiers", command=self.select_files, cursor="hand2",width=35)
         btn_select_files.pack(pady=10)
         
-        btn_process_files = tk.Button(root, text="Charger dans la base", command=self.process_files, cursor="hand2")
+        btn_process_files = tk.Button(root, text="Charger dans la base", command=self.load_to_database, cursor="hand2",width=35)
         btn_process_files.pack(pady=5)
+
+        btn_remove_file = tk.Button(root, text="Supprimer", command=self.remove_file, cursor="hand2",width=35)
+        btn_remove_file.pack(pady=5)
+
+    def load_to_database(self):
+        # Connexion à la base de données MongoDB
+        client = pymongo.MongoClient("mongodb://localhost:27017/")
+        db = client["Hypnose_base"]
+        collection = db["Docs en attente"]
+
         
+        processed_files = 0
+        # Parcourir tous les éléments du Treeview
+        for item in self.tree.get_children():
+            # Récupérer les valeurs de chaque élément
+            #title = self.tree.item(item, 'text')
+            total_files = len(self.tree.get_children())
+            values = self.tree.item(item, 'values')
+
+            # Vérification si le document existe déjà dans la base de données
+            if collection.find_one({"Titre": values[1],"Auteur": values[2]}):
+                messagebox.showinfo("Info", f"Le document '{values[1]}' existe déjà dans la base de données.")
+                continue
+
+            # Insérer les valeurs dans la base de données
+            document = {
+                "Date": values[0],
+                "Titre": values[1],
+                "Auteur": values[2],
+                "Pages": values[3],
+                "Type": values[4],
+                "Langue": values[5],
+                "Contenu": values[6]
+            }
+            collection.insert_one(document)
+
+            processed_files += 1
+            self.progress_bar['value'] = (processed_files / total_files) * 100
+            self.titrebar_label.config(text=f"Insertion dans la base avec succès du document : {document['Titre']} de {document['Auteur']}")
+            self.progress_bar.update()
+
+        # Fermer la connexion à la base de données
+        client.close()
+        # Effacer le contenu du Treeview
+        self.tree.delete(*self.tree.get_children())
+        self.titrebar_label.config(text="")
+        self.progress_bar['value'] = 0
+        
+
+    def remove_file(self):
+        # Récupérer l'élément sélectionné dans le Treeview
+        selected_items = self.tree.selection()
+        if not selected_items:
+            messagebox.showwarning("Avertissement", "Veuillez sélectionner un fichier à supprimer.")
+        else:
+
+            if messagebox.askyesno("Avertissement", "Voulez-vous supprimer ces fichier des documents à charger ?") :              
+                # Supprimer chaque élément sélectionné du Treeview
+                for item in selected_items:
+                    # Supprimer l'élément du Treeview
+                    self.tree.delete(item)
+
     def select_files(self):
+        processed_files = 0 # On réinitilise le nombre de fichier
         filenames = filedialog.askopenfilenames(filetypes=[("Fichiers PDF", "*.pdf"),("Fichiers PDF", "*.csv")])
+
         for filename in filenames:
             Titre=filename.split("/")[-1] # On détermine le nom du document
             Type=Titre.split(".")[-1] # On détermine le type de document
 
             pdf_reader = PyPDF2.PdfReader(filename)
 
+            total_files = len(filenames)
             # On extrait le contenu du document
             text = ""
             Nbrepages=0
@@ -66,10 +139,20 @@ class App:
             except:
                 language="Langue non détectée"
 
-            Auteur = self.extract_metadata(filename) #simpledialog.askstring(Titre, "Quel est l'auteur de ce livre ? :",parent=self.root)
-            Title = self.extract_metadata(filename)
+            infos_doc = self.extract_metadata(filename) #simpledialog.askstring(Titre, "Quel est l'auteur de ce livre ? :",parent=self.root)
+            #Title = self.extract_metadata(filename)
+            self.tree.insert('', 'end', text=filename, values=(datetime.date.today(), infos_doc['Title'], infos_doc['Author'], Nbrepages, Type, language,text))
+
+            # Mettre à jour la barre de progression et le label
+            processed_files += 1
+            self.progress_bar['value'] = (processed_files / total_files) * 100
+            self.titrebar_label.config(text=f"Traitement du fichier : {infos_doc['Title']} de {infos_doc['Author']}")
+            self.progress_bar.update()
             
-            self.tree.insert('', 'end', text=filename, values=(datetime.date.today(), Title['Title'], Auteur['Author'], Nbrepages, Type, language,text))
+        
+        # Réinitialiser la barre de progression et le label une fois tous les fichiers traités
+        self.progress_bar['value'] = 0
+        self.titrebar_label.config(text="")
 
     def extract_metadata(self,file):
         metadata = {}
@@ -91,103 +174,12 @@ class App:
             reader = PyPDF2.PdfReader(file)
             return reader.numPages
     
-    
-    def process_files(self):
-        for child in self.tree.get_children():
-            title = self.tree.item(child, 'text')
-            messagebox.showinfo("Traitement", f"Traitement du fichier : {title}")
-
-            # Extraction du contenu du PDF
-            try:
-                with open(title, 'rb') as file:
-                    reader = PyPDF2.PdfReader(file)
-                    num_pages = reader.numPages
-                    text = ''
-                    for page_num in range(num_pages):
-                        page = reader.getPage(page_num)
-                        text += page.extractText()
-                    
-                    # Vérification des valeurs manquantes
-                    if not self.check_values(title, text):
-                        messagebox.showwarning("Attention", "Certaines valeurs sont manquantes.")
-                        continue
-
-                    # Ici, vous pouvez ajouter le code pour mettre à jour les informations dans la base de données
-                    # Par exemple, insérer le texte extrait dans une base de données MongoDB
-                    # Pour l'exemple, affichons simplement le texte extrait dans une boîte de dialogue
-                    messagebox.showinfo("Contenu extrait", f"Contenu du fichier '{title}':\n{text}")
-
-            except Exception as e:
-                messagebox.showerror("Erreur", f"Une erreur s'est produite lors du traitement du fichier '{title}':\n{str(e)}")
-
-    def check_values(self, title, text):
-        # Vérifiez si les valeurs nécessaires sont présentes dans le texte extrait
-        # Par exemple, vous pouvez rechercher des motifs dans le texte pour les valeurs manquantes
-        # Si une valeur est manquante, demandez à l'utilisateur de la saisir
-        if 'titre:' not in text.lower():
-            new_title = messagebox.askstring("Valeur manquante", f"Entrez le titre pour le fichier '{title}':")
-            if new_title:
-                # Mettez à jour le titre avec la nouvelle valeur saisie
-                title = new_title
-            else:
-                return False
-
-        # Répétez cette vérification pour d'autres valeurs nécessaires comme l'auteur, la date, le genre, etc.
-
-        return True
-
     def center_window(self):
         screen_width = self.root.winfo_screenwidth()
         screen_height = self.root.winfo_screenheight()
         x = (screen_width - self.window_width) // 2
         y = (screen_height - self.window_height) // 2
         self.root.geometry(f"{self.window_width}x{self.window_height}+{x}+{y}")
-
-    def charger_fichier(Base_type, Nom_base, collect=0):
-        # Connexion à la base de données MySQL
-        client = pymongo.MongoClient("mongodb://localhost:27017/")
-        db = client["Hypnose_base"]
-        collection = db["Manage_Users"]
-        
-
-        try:
-            # Ouvrir une boîte de dialogue pour sélectionner un ou plusieurs fichiers
-            noms_fichiers = filedialog.askopenfilenames(title="Sélectionner des fichiers")
-
-            # Vérifier si des fichiers ont été sélectionnés
-            if noms_fichiers:
-                # Parcourir chaque fichier sélectionné
-                for nom_fichier in noms_fichiers:
-                    # Vérifier si le fichier existe et est accessible
-                    if not os.path.isfile(nom_fichier):
-                        print("Le fichier spécifié n'existe pas ou n'est pas accessible :", nom_fichier)
-                        continue
-
-                    # Ouvrir le fichier en mode lecture binaire
-                    with open(nom_fichier, 'rb') as file:
-                        # Récupérer le nom de fichier et l'extension
-                        nom, extension = os.path.splitext(nom_fichier)
-
-                        # Vérifier si l'extension est vide (pas d'extension)
-                        if not extension:
-                            print("Le fichier n'a pas d'extension :", nom_fichier)
-                            continue
-
-                        # Charger le contenu du fichier dans une variable
-                        contenu = file.read()
-
-                        # Exécuter la requête SQL pour insérer le contenu du fichier dans la base de données
-                        
-
-                # Valider la transaction
-                
-
-        except pymongo.Error as e:
-            print("Erreur lors du chargement des fichiers :", e)
-
-        finally:
-            # Fermer le curseur et la connexion
-            client.close()
 
 if __name__ == "__main__":
     root = tk.Tk()
