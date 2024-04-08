@@ -10,6 +10,8 @@ from tkcalendar import DateEntry
 import tkinter as tk
 import pymongo
 import datetime
+from LoadFile import App
+from datetime import datetime
 
 class UserF():
     def __init__(self):
@@ -45,24 +47,15 @@ class UserF():
         Cadre_affichage = ttk.Frame(zone1, borderwidth=2, style='My.TFrame',relief='groove')
         Cadre_affichage.place(x=310,y=55,width=815,height=655)
          
-        # Configuration des scrollbars
-        yscroll = ttk.Scrollbar(Cadre_affichage, orient='vertical')
-        xscroll = ttk.Scrollbar(Cadre_affichage, orient='horizontal')
-
-        # Position d'affichage des scrollbars
-        xscroll.pack(side=BOTTOM,fill=X)
-        yscroll.pack(side=RIGHT,fill=Y)
-
          # Création du Treeview avec 3 colonnes
-        self.tree = ttk.Treeview(Cadre_affichage, columns=("Date",'Titre','Auteur','Pages','Type','Langue'),xscrollcommand=xscroll.set,yscrollcommand=yscroll.set)
+        self.tree = ttk.Treeview(Cadre_affichage, columns=("Date",'Titre','Auteur','Pages','Type','Langue'))
         
         # Définition des en-têtes de colonnes
-        #self.tree.heading('id', text='Id')
         self.tree.heading("Date", text="Date")
         self.tree.heading('Titre', text='Titre')
         self.tree.heading('Auteur', text='Auteur')      
         self.tree.heading("Pages", text="Pages")
-        self.tree.heading("Genre", text="Genre")
+        self.tree.heading("Type", text="Type")
         self.tree.heading("Langue", text="Langue")
         
         self.tree["show"]="headings"
@@ -73,15 +66,33 @@ class UserF():
         self.tree.column('Titre', width=150)
         self.tree.column('Auteur', width=150)
         self.tree.column("Pages", width=50)
-        self.tree.column("Genre", width=150)
+        self.tree.column("Type", width=150)
         self.tree.column("Langue", width=100)
         
         self.tree.pack(expand=True,fill='both')
         self.tree.bind("<ButtonRelease-1")
+
+        # Création de la barre de défilement verticale
+        self.scrollbar_y = tk.Scrollbar(Cadre_affichage, orient="vertical", command=self.tree.yview)
+        self.tree.configure(yscrollcommand=self.scrollbar_y.set)
+
+        # Création de la barre de défilement horizontale
+        self.scrollbar_x = tk.Scrollbar(Cadre_affichage, orient="horizontal", command=self.tree.xview)
+        self.tree.configure(xscrollcommand=self.scrollbar_x.set)
+
+        # Placement du Treeview et des barres de défilement dans la grille
+        self.tree.grid(row=0, column=0, sticky="nsew")
+        self.scrollbar_y.grid(row=0, column=1, sticky="ns")
+        self.scrollbar_x.grid(row=1, column=0, sticky="ew")
+
+        # Configuration des poids de la grille pour le redimensionnement
+        Cadre_affichage.grid_rowconfigure(0, weight=1)
+        Cadre_affichage.grid_columnconfigure(0, weight=1)
+
         # Lier la fonction à l'événement <<TreeviewSelect>>
         self.tree.bind("<<TreeviewSelect>>", self.on_treeview_select)
-        xscroll.bind("<B1-Motion>", lambda event: self.tree.xview_moveto(event.x))
-        yscroll.bind("<B1-Motion>", lambda event: self.tree.yview_moveto(event.y))
+        self.scrollbar_x.bind("<B1-Motion>", lambda event: self.tree.xview_moveto(event.x))
+        self.scrollbar_y.bind("<B1-Motion>", lambda event: self.tree.yview_moveto(event.y))
 
         # Création du cadre pour les box à renseigner
         Cadre_box = ttk.Frame(zone1, borderwidth=2, style='My.TFrame',relief='groove')
@@ -112,15 +123,15 @@ class UserF():
         self.page_entry.place(x=15, y=225,width=200,height=25) 
         
             # Genre
-        self.genre_label = ttk.Label(Cadre_box, text="Genre", font=myFontLabel,width=20,background="white")
+        self.genre_label = ttk.Label(Cadre_box, text="Type", font=myFontLabel,width=20,background="white")
         self.genre_label.place(x=15, y=255)
-        self.genre_entry = ttk.Combobox(Cadre_box, background='#FFFFFF',values=("Roman policier","Littérature fantastique","Science-fiction","Essais","Biographies","Romans d’aventure","Littérature cyberpunk","Récits de voyage","Romans graphiques","Rapports","Autres"))
-        self.genre_entry.place(x=15, y=285,width=200,height=25) 
+        self.type_entry = ttk.Combobox(Cadre_box, background='#FFFFFF',values=("pdf","csv","text","docx"))
+        self.type_entry.place(x=15, y=285,width=200,height=25) 
 
          # Langues
         self.langue_label = ttk.Label(Cadre_box, text="Langue", font=myFontLabel,width=20,background="white")
         self.langue_label.place(x=15, y=315)
-        self.langue_entry = ttk.Combobox(Cadre_box, background='#FFFFFF',values=("Français","Anglais","Allemand","Espagnole","Portugais"))
+        self.langue_entry = ttk.Combobox(Cadre_box, background='#FFFFFF',values=("fr","en","de","es","pt"))
         self.langue_entry.place(x=15, y=345,width=200,height=25) 
 
         # Création du cadre pour les boutons
@@ -138,7 +149,7 @@ class UserF():
         self.checkbox.place(x=8,y=20)
 
         #refresh_button = Button(Cadre_bouton, width=20,text="Actualiser",font=myFontBouton, command="",cursor="hand2").place(x=8, y=50)
-        create_button = Button(zone1, width=15,text="Charger fichiers",font=myFontBouton, command="",cursor="hand2")
+        create_button = Button(zone1, width=15,text="Charger fichiers",font=myFontBouton, command=self.loading_file,cursor="hand2")
         create_button.place(x=970, y=20)    
         update_button = Button(Cadre_box, width=10,text="Enregistrer",font=myFontBouton, command="",cursor="hand2").place(x=15, y=375)
         delete_button = Button(Cadre_box, width=10,text="Supprimer",font=myFontBouton, command="",cursor="hand2").place(x=110, y=375)
@@ -156,6 +167,9 @@ class UserF():
         for col in self.tree["columns"]:
             self.tree.column(col, anchor="center")
 
+    def loading_file(self):
+        app = App(self.window) 
+    
     def etat_modifie(self):
         # Fonction de rappel pour exécuter lorsque la case à cocher est cochée ou décochée
         if self.etat_checkbox.get() == 1:
@@ -189,20 +203,21 @@ class UserF():
             first_selected_item = selected_items[0]
             # Récupérez les valeurs de chaque colonne pour le premier élément sélectionné
             values = event.widget.item(first_selected_item, 'values')
-            #print(values[0],values[1],values[2],values[3],values[4],values[5])
+            
             # Réinitialisation des box
             self.title_entry.delete(0,END)
             self.aut_entry.delete(0,END)
             self.page_entry.delete(0,END)
-            self.genre_entry.set("")
+            self.type_entry.set("")
             self.langue_entry.set("")
 
             # Affichez les valeurs récupérées
-            self.de_entry.set_date(values[0])
+            
+            self.de_entry.set_date(datetime.strptime(values[0], '%Y-%m-%d'))
             self.title_entry.insert(0,values[1])          
             self.aut_entry.insert(0,values[2])
             self.page_entry.insert(0,values[3])
-            self.genre_entry.set(values[4])
+            self.type_entry.set(values[4])
             self.langue_entry.set(values[5])
 
         else:
@@ -215,7 +230,7 @@ class UserF():
             self.title_entry.delete(0,END)
             self.aut_entry.delete(0,END)
             self.page_entry.delete(0,END)
-            self.genre_entry.set("")
+            self.type_entry.set("")
             self.langue_entry.set("")
 
     def center_window(self,window_width,window_height):
@@ -244,7 +259,7 @@ class UserF():
 
             # Insertion des données dans le Treeview
             for doc in cursor:
-                self.tree.insert('', 'end', values=(doc['créé'],doc['titre'], doc['auteur'],doc['nombre de page'],doc['genre'],doc['langue']))
+                self.tree.insert('', 'end', values=(doc['Date'],doc['Titre'], doc['Auteur'],doc['Pages'],doc['Type'],doc['Langue']))
 
             client.close()
 
@@ -263,7 +278,7 @@ class UserF():
 
             # Insertion des données dans le Treeview
             for doc in cursor:
-                self.tree.insert('', 'end', values=(doc['créé'],doc['titre'], doc['auteur'],doc['nombre de page'],doc['genre'],doc['langue']))
+                self.tree.insert('', 'end', values=(doc['Date'],doc['Titre'], doc['Auteur'],doc['Pages'],doc['Type'],doc['Langue']))
 
             client.close()
 
