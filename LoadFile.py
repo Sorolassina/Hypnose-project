@@ -51,114 +51,108 @@ class App():
         btn_select_files = tk.Button(self.root, text="Sélectionner des fichiers", command=self.select_files, cursor="hand2",width=35)
         btn_select_files.pack(pady=10)
         
-        self.btn_process_files = tk.Button(self.root, text="Charger dans la base", command=self.load_to_database, cursor="hand2",width=35,state='disabled')
+        self.btn_process_files = tk.Button(self.root, text="Charger dans la base", command=self.Appel_loading_data, cursor="hand2",width=35,state='disabled')
         self.btn_process_files.pack(pady=5)
 
         btn_remove_file = tk.Button(self.root, text="Supprimer", command=self.remove_file, cursor="hand2",width=35)
         btn_remove_file.pack(pady=5)
 
-        self.basecloud_checkbox = tk.IntVar()
-        self.checkbox_basecloud = ttk.Checkbutton(self.root, text="Stockage cloud", cursor="hand2",variable=self.basecloud_checkbox, command=self.etat_modifie)
+        self.basecloud_var = tk.IntVar()
+        self.checkbox_basecloud = ttk.Checkbutton(self.root, text="Stockage cloud", cursor="hand2",variable=self.basecloud_var,command=self.upload_button)
         self.checkbox_basecloud.place(x=855,y=345)
 
-        self.baselocale_checkbox = tk.IntVar()
-        self.checkbox_baseclocale = ttk.Checkbutton(self.root, text="Stockage local", cursor="hand2",variable=self.baselocale_checkbox, command=self.etat_modifie)
+        self.baselocale_var = tk.IntVar()
+        self.checkbox_baseclocale = ttk.Checkbutton(self.root, text="Stockage local", cursor="hand2",variable=self.baselocale_var,command=self.upload_button)
         self.checkbox_baseclocale.place(x=855,y=370)
 
-        self.docattente_checkbox = tk.IntVar()
-        self.checkbox_docattente = ttk.Checkbutton(self.root, text="Mettre en attente les documents stockés", cursor="hand2",variable=self.docattente_checkbox, command=self.etat_modifie)
+        self.docattente_var = tk.IntVar()
+        self.checkbox_docattente = ttk.Checkbutton(self.root, text="Mettre en attente les documents stockés", cursor="hand2",variable=self.docattente_var,command=self.upload_button)
         self.checkbox_docattente.place(x=1050,y=345)
 
-        self.docvalide_checkbox = tk.IntVar()
-        self.checkbox_docvalide = ttk.Checkbutton(self.root, text="Marquer ces documents comme certifiés", cursor="hand2",variable=self.docvalide_checkbox, command=self.etat_modifie)
+        self.docvalide_var = tk.IntVar()
+        self.checkbox_docvalide = ttk.Checkbutton(self.root, text="Marquer ces documents comme certifiés", cursor="hand2",variable=self.docvalide_var,command=self.upload_button)
         self.checkbox_docvalide.place(x=1050,y=370)
 
-        self.cloudBD=tk.StringVar()
-        self.localBD=tk.StringVar()
-        self.certifie=tk.StringVar()
-        self.noncertifie=tk.StringVar()
+        # Bloquer le focus sur la fenêtre popup
+        self.root.grab_set()
 
-    def etat_modifie(self):
-        # Fonction de rappel pour exécuter lorsque la case à cocher est cochée ou décochée
-        if (self.basecloud_checkbox.get() == 1 and self.docattente_checkbox.get() == 1) :           
+    def upload_button (self):
+
+        self.CheckBoxDB_manage()
+        self.CheckBoxCollect_manage()
+
+        if self.basecloud_var.get() == 1 and self.docvalide_var.get() == 1:
+           self.btn_process_files.config(state="normal")   
+        elif self.baselocale_var.get() == 1 and self.docvalide_var.get() == 1:
+           self.btn_process_files.config(state="normal")   
+        elif self.baselocale_var.get() == 1 and self.docattente_var.get() == 1:
+           self.btn_process_files.config(state="normal")  
+        elif self.basecloud_var.get() == 1 and self.docattente_var.get() == 1:
+           self.btn_process_files.config(state="normal")
+        else :
+            self.btn_process_files.config(state="disabled")  
+    
+    def CheckBoxDB_manage(self):
+    # Fonction de rappel pour exécuter lorsque la case à cocher est cochée ou décochée
+
+        if self.basecloud_var.get() == 1 and self.baselocale_var.get() == 0 :           
             self.checkbox_baseclocale.config(state="disabled")
-            self.checkbox_docvalide.config(state="disabled")
-            self.cloudBD="MongoCloud"
-            self.noncertifie="noncertifie"
-            self.btn_process_files.config(state="normal")
 
-        elif (self.basecloud_checkbox.get() == 1 and self.docvalide_checkbox.get() == 1) :           
-            self.checkbox_baseclocale.config(state="disabled")
-            self.checkbox_docattente.config(state="disabled")
-            self.cloudBD="MongoCloud"
-            self.certifie="certifie"
-            self.btn_process_files.config(state="normal")
-        
-        elif (self.baselocale_checkbox.get() == 1 and self.docattente_checkbox.get() == 1) :           
+        elif self.baselocale_var.get() == 1 and self.basecloud_var.get() == 0  :           
             self.checkbox_basecloud.config(state="disabled")
-            self.checkbox_docvalide.config(state="disabled")
-            self.cloudBD="MongoLocale"
-            self.noncertifie="noncertifie"
-            self.btn_process_files.config(state="normal")
 
-        elif (self.baselocale_checkbox.get() == 1 and self.docvalide_checkbox.get() == 1) :
-            
-            self.checkbox_basecloud.config(state="disabled")
-            self.checkbox_docattente.config(state="disabled")
-            self.cloudBD="MongoLocale"
-            self.certifie="certifie"
-            self.btn_process_files.config(state="normal")
-        
-        elif self.basecloud_checkbox.get() == 1  :           
-            self.checkbox_baseclocale.config(state="disabled")
-            self.btn_process_files.config(state="disabled")
-
-        elif self.baselocale_checkbox.get() == 1  :           
-            self.checkbox_basecloud.config(state="disabled")
-            self.btn_process_files.config(state="disabled")
-
-        elif self.docattente_checkbox.get() == 1  :           
-            self.checkbox_docvalide.config(state="disabled")
-            self.btn_process_files.config(state="disabled")
-
-        elif self.docvalide_checkbox.get() == 1  :           
-            self.checkbox_docattente.config(state="disabled")
-            self.btn_process_files.config(state="disabled")
-
-        else:
+        elif self.basecloud_var.get() == 0 and self.baselocale_var.get() == 0 :           
             self.checkbox_baseclocale.config(state="normal")
             self.checkbox_basecloud.config(state="normal")
+
+    def CheckBoxCollect_manage(self):
+    # Fonction de rappel pour exécuter lorsque la case à cocher est cochée ou décochée
+        if self.docvalide_var.get() == 1 and self.docattente_var.get() == 0 :           
+            self.checkbox_docattente.config(state="disabled")
+
+        elif self.docattente_var.get() == 1 and self.docvalide_var.get() == 0  :           
+            self.checkbox_docvalide.config(state="disabled")
+       
+        elif self.docvalide_var.get() == 0 and self.docattente_var.get() == 0 :           
             self.checkbox_docattente.config(state="normal")
             self.checkbox_docvalide.config(state="normal")
-            self.cloudBD=""
-            self.localBD=""
-            self.btn_process_files.config(state="disabled")
+   
+    def Appel_loading_data(self) :
+        if self.basecloud_var.get() == 1 and self.docvalide_var.get() == 1:      
+           self.load_to_database()
+        elif self.baselocale_var.get() == 1 and self.docvalide_var.get() == 1:      
+           self.load_to_database()
+        elif self.baselocale_var.get() == 1 and self.docattente_var.get() == 1:     
+           self.load_to_database()
+        elif self.basecloud_var.get() == 1 and self.docattente_var.get() == 1:
+           self.load_to_database()
+        else :
+           messagebox.showinfo("Upload", "Merci de sélectionner une collection dans votre base cloud.")
  
     def load_to_database(self):
         # Connexion à la base de données MongoDB
-        if self.cloudBD=="MongoCloud" :
+        if self.basecloud_var.get() == 1  :
             client = pymongo.MongoClient("mongodb+srv://sorolassina:2311SLSS@hypnosecluster.5vtl4ex.mongodb.net/")
             db = client["Hypnose_Cloud"]
 
-
-            if self.certifie=="certifie":
+            if self.docvalide_var.get() == 1:
                 collection = db["Docs validés"]
-            elif self.noncertifie=="noncertifie":
+            elif self.docattente_var.get() == 1:
                 collection = db["Docs en attente"]
             else:
                 messagebox.showinfo("Upload", "Merci de sélectionner une collection dans votre base cloud.")
                 return
 
-        elif self.localBD=="MongoLocal" :
+        elif self.baselocale_var.get() == 1 :
             client = pymongo.MongoClient("mongodb://localhost:27017/")
             db = client["Hypnose_base"]
 
-            if self.certifie=="certifie":
+            if self.docvalide_var.get() == 1:
                 collection = db["Docs validés"]
-            elif self.noncertifie=="noncertifie":
+            elif self.docattente_var.get() == 1:
                 collection = db["Docs en attente"]
             else:
-                messagebox.showinfo("Upload", "Merci de sélectionner une collection dans votre base locale.")
+                messagebox.showinfo("Upload", "Merci de sélectionner une collection dans votre base cloud.")
                 return
         
         else :
@@ -202,8 +196,10 @@ class App():
         self.tree.delete(*self.tree.get_children())
         self.titrebar_label.config(text="")
         self.progress_bar['value'] = 0
-        
 
+        self.root.destroy()
+        return
+    
     def remove_file(self):
         # Récupérer l'élément sélectionné dans le Treeview
         selected_items = self.tree.selection()
@@ -222,6 +218,9 @@ class App():
         processed_files = 0 # On réinitilise le nombre de fichier
         filenames = filedialog.askopenfilenames(filetypes=[("Fichiers PDF", "*.pdf"),("Fichiers PDF", "*.csv")])
 
+        # Bloquer le focus sur la fenêtre popup
+        self.root.grab_set()
+
         for filename in filenames:
             Titre=filename.split("/")[-1] # On détermine le nom du document
             Type=Titre.split(".")[-1] # On détermine le type de document
@@ -234,13 +233,18 @@ class App():
             Nbrepages=0
             for page_num in range(len(pdf_reader.pages)):
                 page = pdf_reader.pages[page_num]
-                text += page.extract_text()
-                Nbrepages+=page_num+1
+                
+                try: # On va déterminer ensuite la langue du documents
+                    text += page.extract_text()
+                    Nbrepages+=1
+                except Exception as e:
+                    messagebox.showwarning("Extraction",f"Error extracting text from page {page_num + 1}: {e}")
 
-            try: # On va déterminer ensuite la langue du documents
+            try:
                 language = detect(text)
-            except:
-                language="Langue non détectée"
+            except Exception as e:
+                language = "Langue non détectée"
+                messagebox.showwarning("Extraction",f"Error detecting language: {e}")
 
             infos_doc = self.extract_metadata(filename) #simpledialog.askstring(Titre, "Quel est l'auteur de ce livre ? :",parent=self.root)
             #Title = self.extract_metadata(filename)
