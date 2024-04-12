@@ -1,28 +1,27 @@
 import tkinter as tk
-from tkinter import filedialog, messagebox
+from tkinter import filedialog, messagebox, simpledialog
 from tkinter.ttk import Treeview
 import datetime
-import PyPDF2
 import pymongo
-from tkinter import messagebox, simpledialog
-from langdetect import detect
-import fitz  # PyMuPDF
 from tkinter import ttk
-from tkinter import *
+from pymongo import MongoClient
 from gridfs import GridFS
 import os
+from langdetect import detect
+import PyPDF2
+import fitz  # PyMuPDF
 
 class App():
     def __init__(self, master=None):
         self.master=master
-        self.root = Toplevel(self.master)
+        self.root = tk.Toplevel(self.master)
         self.root.title("Hypnose Manager file")
         self.root.iconbitmap('logo2.ico')
 
         self.window_width = 1380
         self.window_height = 450
         self.center_window()
-       
+
         self.tree = Treeview(self.root, columns=('Date', 'Titre', 'Auteur', 'Pages', 'Type', 'Langue','Contenu'))
         self.tree.heading('#0', text='Chemin')
         self.tree.heading('Date', text='Date')
@@ -43,43 +42,45 @@ class App():
         self.tree.column("Langue", width=70)
         self.tree.column("Contenu", width=70)
 
-        # Création de la barre de progression avec une hauteur personnalisée en modifiant la taille de la police
-        self.titrebar_label = ttk.Label(self.root, text="", font=("Arial", 8),width=1380)
+        self.titrebar_label = ttk.Label(self.root, text="", font=("Arial", 8), width=1380)
         self.titrebar_label.pack(pady=5)
         
         self.progress_bar = ttk.Progressbar(self.root, orient=tk.HORIZONTAL, length=1380, mode='determinate')
         self.progress_bar.pack(pady=5)
         
-        btn_select_files = tk.Button(self.root, text="Sélectionner des fichiers", command=self.select_files, cursor="hand2",width=35)
+        btn_select_files = tk.Button(self.root, text="Sélectionner des fichiers", command=self.select_files, cursor="hand2", width=35)
         btn_select_files.pack(pady=10)
         
-        self.btn_process_files = tk.Button(self.root, text="Charger dans la base", command=self.Appel_loading_data, cursor="hand2",width=35,state='disabled')
+        self.btn_process_files = tk.Button(self.root, text="Charger dans la base", command=self.Appel_loading_data, cursor="hand2", width=35, state='disabled')
         self.btn_process_files.pack(pady=5)
 
         btn_remove_file = tk.Button(self.root, text="Supprimer", command=self.remove_file, cursor="hand2",width=35)
         btn_remove_file.pack(pady=5)
 
+        # Connexion à MongoDB
+        self.client = MongoClient('mongodb://localhost:27017/')
+        self.db = self.client["Hypnose_base"]
+        self.fs = GridFS(self.db)
+
         self.basecloud_var = tk.IntVar()
-        self.checkbox_basecloud = ttk.Checkbutton(self.root, text="Stockage cloud", cursor="hand2",variable=self.basecloud_var,command=self.upload_button)
+        self.checkbox_basecloud = ttk.Checkbutton(self.root, text="Stockage cloud", cursor="hand2", variable=self.basecloud_var, command=self.upload_button)
         self.checkbox_basecloud.place(x=855,y=345)
 
         self.baselocale_var = tk.IntVar()
-        self.checkbox_baseclocale = ttk.Checkbutton(self.root, text="Stockage local", cursor="hand2",variable=self.baselocale_var,command=self.upload_button)
+        self.checkbox_baseclocale = ttk.Checkbutton(self.root, text="Stockage local", cursor="hand2", variable=self.baselocale_var, command=self.upload_button)
         self.checkbox_baseclocale.place(x=855,y=370)
 
         self.docattente_var = tk.IntVar()
-        self.checkbox_docattente = ttk.Checkbutton(self.root, text="Mettre en attente les documents stockés", cursor="hand2",variable=self.docattente_var,command=self.upload_button)
+        self.checkbox_docattente = ttk.Checkbutton(self.root, text="Mettre en attente les documents stockés", cursor="hand2", variable=self.docattente_var, command=self.upload_button)
         self.checkbox_docattente.place(x=1050,y=345)
 
         self.docvalide_var = tk.IntVar()
-        self.checkbox_docvalide = ttk.Checkbutton(self.root, text="Marquer ces documents comme certifiés", cursor="hand2",variable=self.docvalide_var,command=self.upload_button)
+        self.checkbox_docvalide = ttk.Checkbutton(self.root, text="Marquer ces documents comme certifiés", cursor="hand2", variable=self.docvalide_var, command=self.upload_button)
         self.checkbox_docvalide.place(x=1050,y=370)
 
-        # Bloquer le focus sur la fenêtre popup
         self.root.grab_set()
 
     def upload_button (self):
-
         self.CheckBoxDB_manage()
         self.CheckBoxCollect_manage()
 
@@ -93,10 +94,8 @@ class App():
            self.btn_process_files.config(state="normal")
         else :
             self.btn_process_files.config(state="disabled")  
-    
-    def CheckBoxDB_manage(self):
-    # Fonction de rappel pour exécuter lorsque la case à cocher est cochée ou décochée
 
+    def CheckBoxDB_manage(self):
         if self.basecloud_var.get() == 1 and self.baselocale_var.get() == 0 :           
             self.checkbox_baseclocale.config(state="disabled")
 
@@ -108,7 +107,6 @@ class App():
             self.checkbox_basecloud.config(state="normal")
 
     def CheckBoxCollect_manage(self):
-    # Fonction de rappel pour exécuter lorsque la case à cocher est cochée ou décochée
         if self.docvalide_var.get() == 1 and self.docattente_var.get() == 0 :           
             self.checkbox_docattente.config(state="disabled")
 
@@ -118,8 +116,8 @@ class App():
         elif self.docvalide_var.get() == 0 and self.docattente_var.get() == 0 :           
             self.checkbox_docattente.config(state="normal")
             self.checkbox_docvalide.config(state="normal")
-   
-    def Appel_loading_data(self) :
+
+    def Appel_loading_data(self):
         if self.basecloud_var.get() == 1 and self.docvalide_var.get() == 1:      
            self.load_to_database()
         elif self.baselocale_var.get() == 1 and self.docvalide_var.get() == 1:      
@@ -130,54 +128,52 @@ class App():
            self.load_to_database()
         else :
            messagebox.showinfo("Upload", "Merci de sélectionner une collection dans votre base cloud.")
- 
+    
     def load_to_database(self):
         # Connexion à la base de données MongoDB
         if self.basecloud_var.get() == 1  :
             client = pymongo.MongoClient("mongodb+srv://sorolassina:2311SLSS@hypnosecluster.5vtl4ex.mongodb.net/")
-            
+            db = client["Hypnose_Cloud"]
+
             if self.docvalide_var.get() == 1:
-                db = client["Hypnose_documents_validés"]
-                #collection = db["Docs validés"]
+                collection = db["Docs validés"]
             elif self.docattente_var.get() == 1:
-                db = client["Hypnose_documents_en_attente"]
-                #collection = db["Docs en attente"]
+                collection = db["Docs en attente"]
             else:
-                messagebox.showinfo("Upload", "Merci de sélectionner une collection dans votre cloud.")
+                messagebox.showinfo("Upload", "Merci de sélectionner une collection dans votre base cloud.")
                 return
 
         elif self.baselocale_var.get() == 1 :
             client = pymongo.MongoClient("mongodb://localhost:27017/")
-            #db = client["Test_hypnose"]
-
+            db = client["Hypnose_base"]
             if self.docvalide_var.get() == 1:
-                db = client["Hypnose_documents_validés"]
-                #collection = db["Docs validés"]
+                collection = db["Docs validés"]
             elif self.docattente_var.get() == 1:
-                db = client["Hypnose_documents_en_attente"]
-                #collection = db["Docs en attente"]
+                collection = db["Docs en attente"]
             else:
                 messagebox.showinfo("Upload", "Merci de sélectionner une collection dans votre base cloud.")
-                return
-        
+                return       
         else :
             messagebox.showinfo("Upload", "Merci de sélectionner une base.")
             return
-
 
         processed_files = 0
         # Parcourir tous les éléments du Treeview
         for item in self.tree.get_children():
             # Récupérer les valeurs de chaque élément
-            #title = self.tree.item(item, 'text')
+            
             total_files = len(self.tree.get_children())
             values = self.tree.item(item, 'values')
-            chemin = self.tree.item(item, 'text')
-            
+
+            # Nous permettra de stocker le contenu dans un gridfs
+            filename = self.tree.item(item, 'text')
+            with open(filename, 'rb') as f:
+                file_id = self.fs.put(f, filename=filename)
+
             # Vérification si le document existe déjà dans la base de données
-            #if collection.find_one({"Titre": values[1],"Auteur": values[2]}):
-                #messagebox.showinfo("Info", f"Le document '{values[1]}' existe déjà dans la base de données.")
-                #continue
+            if collection.find_one({"Titre": values[1],"Auteur": values[2]}):
+                messagebox.showinfo("Info", f"Le document '{values[1]}' existe déjà dans la base de données.")
+                continue
 
             # Insérer les valeurs dans la base de données
             document = {
@@ -189,9 +185,7 @@ class App():
                 "Langue": values[5],
                 "Contenu": values[6]
             }
-
-            
-            self.Stockage_Gridfs (db, chemin, document)
+            collection.insert_one(document)
 
             processed_files += 1
             self.progress_bar['value'] = (processed_files / total_files) * 100
@@ -207,27 +201,6 @@ class App():
 
         self.root.destroy()
         return
-    
-
-    def Stockage_Gridfs (self, db, pdf_file_path, doc):
-        # Se connecter à MongoDB
-        print (doc)
-        fs = GridFS(db)
-        filename=pdf_file_path
-        # Définir les métadonnées du fichier
-        metadata = {
-            'filename': filename.split("/")[-1],  # Nom du fichier
-            'type': doc['Type'],  # Type de fichier
-            'language': doc['Langue'],  # Langue du document
-            'author': doc['Auteur'], 
-            'pages': doc['Pages'],
-            'contenu': doc['Contenu']
-              
-        }
-
-        # Ouvrir le fichier PDF et le stocker dans GridFS avec les métadonnées
-        with open(filename, 'rb') as pdf_file:
-            file_id = fs.put(pdf_file, metadata=metadata)
 
     def remove_file(self):
         # Récupérer l'élément sélectionné dans le Treeview
@@ -243,6 +216,62 @@ class App():
                     # Supprimer l'élément du Treeview
                     self.tree.delete(item)
 
+
+
+    def select_files(self):
+        processed_files = 0
+        filenames = filedialog.askopenfilenames(filetypes=[("Fichiers PDF", "*.pdf"),("Fichiers PDF", "*.csv")])
+        self.root.grab_set()
+
+        for filename in filenames:
+            Titre = os.path.basename(filename)
+            Type = Titre.split(".")[-1]
+
+            pdf_reader = PyPDF2.PdfReader(filename)
+            Nbrepages = len(pdf_reader.pages)
+
+            try:
+                with open(filename, 'rb') as f:
+                    text = f.read().decode('latin-1')
+                    language = detect(text)
+            except Exception as e:
+                language = "Langue non détectée"
+                messagebox.showwarning("Extraction", f"Error detecting language: {e}")
+
+            infos_doc = self.extract_metadata(filename)
+            self.tree.insert('', 'end', text=filename, values=(datetime.date.today(), infos_doc['Title'], infos_doc['Author'], Nbrepages, Type, language, text))
+
+            processed_files += 1
+            self.progress_bar['value'] = (processed_files / len(filenames)) * 100
+            self.titrebar_label.config(text=f"Traitement du fichier : {infos_doc['Title']} de {infos_doc['Author']}")
+            self.progress_bar.update()
+
+        self.progress_bar['value'] = 0
+        self.titrebar_label.config(text="")
+
+    def extract_metadata(self, file):
+        metadata = {}
+        pdf_document = fitz.open(file)
+        
+        metadata['Title'] = pdf_document.metadata.get('title', '')
+        metadata['Author'] = pdf_document.metadata.get('author', '')
+        metadata['Subject'] = pdf_document.metadata.get('subject', '')
+        metadata['Producer'] = pdf_document.metadata.get('producer', '')
+        metadata['CreationDate'] = pdf_document.metadata.get('creationDate', '')
+        metadata['ModificationDate'] = pdf_document.metadata.get('modDate', '')
+
+        pdf_document.close()
+
+        return metadata
+
+    def center_window(self):
+        screen_width = self.root.winfo_screenwidth()
+        screen_height = self.root.winfo_screenheight()
+        x = (screen_width - self.window_width) // 2
+        y = (screen_height - self.window_height) // 2
+        self.root.geometry(f"{self.window_width}x{self.window_height}+{x}+{y}")
+
+    """ # ORIGINAL DE LoadFile.py
     def select_files(self):
         processed_files = 0 # On réinitilise le nombre de fichier
         filenames = filedialog.askopenfilenames(filetypes=[("Fichiers PDF", "*.pdf"),("Fichiers PDF", "*.csv")])
@@ -251,16 +280,16 @@ class App():
         self.root.grab_set()
 
         for filename in filenames:
-            Titre=filename.split("/")[-1] # On détermine le nom du document
+            Titre= os.path.basename(filename) # On détermine le nom du document
             Type=Titre.split(".")[-1] # On détermine le type de document
 
             pdf_reader = PyPDF2.PdfReader(filename)
 
-            total_files = len(filenames)
+            #total_files = len(filenames)
             # On extrait le contenu du document
             text = ""
             Nbrepages=0
-
+            
             for page_num in range(len(pdf_reader.pages)):
                 page = pdf_reader.pages[page_num]
                 
@@ -289,37 +318,8 @@ class App():
         # Réinitialiser la barre de progression et le label une fois tous les fichiers traités
         self.progress_bar['value'] = 0
         self.titrebar_label.config(text="")
+ """
 
-    
-
-    def extract_metadata(self,file):
-        metadata = {}
-        pdf_document = fitz.open(file)
-        
-        metadata['Title'] = pdf_document.metadata.get('title', '')
-        metadata['Author'] = pdf_document.metadata.get('author', '')
-        metadata['Subject'] = pdf_document.metadata.get('subject', '')
-        metadata['Producer'] = pdf_document.metadata.get('producer', '')
-        metadata['CreationDate'] = pdf_document.metadata.get('creationDate', '')
-        metadata['ModificationDate'] = pdf_document.metadata.get('modDate', '')
-
-        pdf_document.close()
-
-        return metadata
-
-    def count_pdf_pages(pdf_file_path):
-        with open(pdf_file_path, 'rb') as file:
-            reader = PyPDF2.PdfReader(file)
-            return reader.numPages
-    
-    def center_window(self):
-        screen_width = self.root.winfo_screenwidth()
-        screen_height = self.root.winfo_screenheight()
-        x = (screen_width - self.window_width) // 2
-        y = (screen_height - self.window_height) // 2
-        self.root.geometry(f"{self.window_width}x{self.window_height}+{x}+{y}")
-
-    
 if __name__ == "__main__":    
-    app = App() # Capture le focus sur la fenêtre CreateLog
+    app = App()
     app.root.mainloop()
