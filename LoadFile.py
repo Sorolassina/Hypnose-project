@@ -169,7 +169,7 @@ class App():
         # Parcourir tous les éléments du Treeview
         for item in self.tree.get_children():
             # Récupérer les valeurs de chaque élément
-            #title = self.tree.item(item, 'text')
+            
             total_files = len(self.tree.get_children())
             values = self.tree.item(item, 'values')
             chemin = self.tree.item(item, 'text')

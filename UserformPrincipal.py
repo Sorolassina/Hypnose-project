@@ -50,7 +50,7 @@ class UserF():
         self.style.configure('My.TFrame', background='#FFFFFF')  # Couleur de fond grise
         # Création du cadre avec une bordure et une couleur de fond
         Cadre_affichage = ttk.Frame(zone1, borderwidth=2, style='My.TFrame',relief='groove')
-        Cadre_affichage.place(x=310,y=55,width=815,height=655)
+        Cadre_affichage.place(x=100,y=55,width=1010,height=655)
          
          # Création du Treeview avec 3 colonnes
         self.tree = ttk.Treeview(Cadre_affichage, columns=("Date",'Titre','Auteur','Pages','Type','Langue','Id'))
@@ -78,7 +78,7 @@ class UserF():
         self.tree.pack(expand=True,fill='both')
 
         # Configuration des événement liés à ma treeview
-        self.tree.bind("<ButtonRelease-1>", self.on_treeview_select)
+        #self.tree.bind("<ButtonRelease-1>", self.on_treeview_select)
         self.tree.bind("<Double-1>", self.display_pdf)
         self.tree.bind("<Enter>", lambda event: self.tree.config(cursor="hand2"))
         self.tree.bind("<Leave>", lambda event: self.tree.config(cursor=""))
@@ -109,43 +109,43 @@ class UserF():
 
         # Création du cadre pour les box à renseigner
         Cadre_box = ttk.Frame(zone1, borderwidth=2, style='My.TFrame',relief='groove')
-        Cadre_box.place(x=20,y=20,width=280,height=690)
+        Cadre_box.place(x=20,y=20,width=80,height=690)
                      
             # Titre 
-        self.title_label = ttk.Label(Cadre_box, text="Titre", font=myFontLabel,width=20,background="white")
-        self.title_label.place(x=15, y=15)
-        self.title_entry = Entry(Cadre_box, background='#FFFFFF')
-        self.title_entry.place(x=15, y=45,width=200,height=25) 
+        #self.title_label = ttk.Label(Cadre_box, text="Titre", font=myFontLabel,width=20,background="white")
+        #self.title_label.place(x=15, y=15)
+        #self.title_entry = Entry(Cadre_box, background='#FFFFFF')
+        #self.title_entry.place(x=15, y=45,width=200,height=25) 
 
             # Auteur 
-        self.aut_label = ttk.Label(Cadre_box, text="Auteur", font=myFontLabel,width=20,background="white")
-        self.aut_label.place(x=15, y=75)
-        self.aut_entry = Entry(Cadre_box, background='#FFFFFF')
-        self.aut_entry.place(x=15, y=105,width=200,height=25) 
+        #self.aut_label = ttk.Label(Cadre_box, text="Auteur", font=myFontLabel,width=20,background="white")
+        #self.aut_label.place(x=15, y=75)
+        #self.aut_entry = Entry(Cadre_box, background='#FFFFFF')
+        #self.aut_entry.place(x=15, y=105,width=200,height=25) 
   
             # Date enregistrement 
-        self.de_label = ttk.Label(Cadre_box, text="Date", font=myFontLabel,width=20,background="white")
-        self.de_label.place(x=15, y=135)
-        self.de_entry = DateEntry(Cadre_box, background='#FFFFFF')
-        self.de_entry.place(x=15, y=165,width=200,height=25)
+        #self.de_label = ttk.Label(Cadre_box, text="Date", font=myFontLabel,width=20,background="white")
+        #self.de_label.place(x=15, y=135)
+        #self.de_entry = DateEntry(Cadre_box, background='#FFFFFF')
+        #self.de_entry.place(x=15, y=165,width=200,height=25)
 
             # Nombre de page 
-        self.page_label = ttk.Label(Cadre_box, text="Pages", font=myFontLabel,width=20,background="white")
-        self.page_label.place(x=15, y=195)
-        self.page_entry = Entry(Cadre_box, background='#FFFFFF')
-        self.page_entry.place(x=15, y=225,width=200,height=25) 
+        #self.page_label = ttk.Label(Cadre_box, text="Pages", font=myFontLabel,width=20,background="white")
+        #self.page_label.place(x=15, y=195)
+        #self.page_entry = Entry(Cadre_box, background='#FFFFFF')
+        #self.page_entry.place(x=15, y=225,width=200,height=25) 
         
             # Genre
-        self.genre_label = ttk.Label(Cadre_box, text="Type", font=myFontLabel,width=20,background="white")
-        self.genre_label.place(x=15, y=255)
-        self.type_entry = ttk.Combobox(Cadre_box, background='#FFFFFF',values=("pdf","csv","text","docx"))
-        self.type_entry.place(x=15, y=285,width=200,height=25) 
+        #self.genre_label = ttk.Label(Cadre_box, text="Type", font=myFontLabel,width=20,background="white")
+        #self.genre_label.place(x=15, y=255)
+        #self.type_entry = ttk.Combobox(Cadre_box, background='#FFFFFF',values=("pdf","csv","text","docx"))
+        #self.type_entry.place(x=15, y=285,width=200,height=25) 
 
          # Langues
-        self.langue_label = ttk.Label(Cadre_box, text="Langue", font=myFontLabel,width=20,background="white")
-        self.langue_label.place(x=15, y=315)
-        self.langue_entry = ttk.Combobox(Cadre_box, background='#FFFFFF',values=("fr","en","de","es","pt"))
-        self.langue_entry.place(x=15, y=345,width=200,height=25) 
+        #self.langue_label = ttk.Label(Cadre_box, text="Langue", font=myFontLabel,width=20,background="white")
+        #self.langue_label.place(x=15, y=315)
+        #self.langue_entry = ttk.Combobox(Cadre_box, background='#FFFFFF',values=("fr","en","de","es","pt"))
+        #self.langue_entry.place(x=15, y=345,width=200,height=25) 
 
         # Création du cadre pour les boutons
         Cadre_bouton = ttk.Frame(zone1, borderwidth=2, style='My.TFrame',relief="solid")
@@ -195,31 +195,35 @@ class UserF():
         #refresh_button = Button(Cadre_bouton, width=20,text="Actualiser",font=myFontBouton, command="",cursor="hand2").place(x=8, y=50)
         create_button = Button(zone1, width=15,text="Charger fichiers",font=myFontBouton, command=self.loading_file,cursor="hand2")
         create_button.place(x=970, y=20)    
-        update_button = Button(Cadre_box, width=10,text="Enregistrer",font=myFontBouton, command="",cursor="hand2").place(x=15, y=390)
-        delete_button = Button(Cadre_box, width=10,text="Supprimer",font=myFontBouton, command="",cursor="hand2").place(x=110, y=390)
-        
+        self.update_button = Button(Cadre_bouton, width=20,text="Transférer",font=myFontBouton, command=self.transfer_selected_documents,state="disabled",cursor="hand2")
+        self.update_button.place(x=8, y=180) 
+        delete_button = Button(Cadre_bouton, width=20,text="Supprimer",font=myFontBouton, command="",cursor="hand2")
+        delete_button.place(x=8, y=270)
         self.lookvalue_entry = ttk.Entry(zone1, background='#FFFFFF')
         self.lookvalue_entry.place(x=310, y=20,width=500,height=28) 
         self.lookvalue_entry.bind("<KeyRelease>", self.filter_tree)
 
         look_button = Button(zone1, width=15,text="Rechercher",foreground="black",font=myFontBouton, command="",cursor="hand2")      
-        look_button.place(x=825, y=20)  
+        look_button.place(x=825, y=20)
 
-        #Choix pour changement de base et de collection
-        self.changeDB_var = tk.IntVar(value=0)
-        self.checkbox_ChangeDB = ttk.Checkbutton(Cadre_box, text="Changer de base ?", cursor="hand2",variable=self.changeDB_var,style="White.TCheckbutton",state="disabled",command=self.changerbase)
-        self.checkbox_ChangeDB.place(x=15, y=430)
+        look_label = Label(zone1, width=15,text="Rechercher ici :",foreground="black",font=myFontLabel)      
+        look_label.place(x=150, y=20)    
 
-        self.changeCollection_var = tk.IntVar(value=0)
-        self.checkbox_ChangeCollection = ttk.Checkbutton(Cadre_box, text="Changer de collection ?", cursor="hand2",variable=self.changeCollection_var,style="White.TCheckbutton",state="disabled",command=self.changercollection)
-        self.checkbox_ChangeCollection.place(x=15, y=450)
+        #Choix pour changement de Storage et de Base
+        self.changestorage_var = tk.IntVar(value=0)
+        self.checkbox_ChangeDB = ttk.Checkbutton(Cadre_bouton, text="Changer de Storage ?", cursor="hand2",variable=self.changestorage_var,style="White.TCheckbutton",state="disabled",command=self.changerbase)
+        self.checkbox_ChangeDB.place(x=8, y=210)
+
+        self.changebase_var = tk.IntVar(value=0)
+        self.checkbox_ChangeCollection = ttk.Checkbutton(Cadre_bouton, text="Changer de Base ?", cursor="hand2",variable=self.changebase_var,style="White.TCheckbutton",state="disabled",command=self.changercollection)
+        self.checkbox_ChangeCollection.place(x=8, y=230)
 
          #Création de nos variables
-        self.EltAChanger={'Id':"",'Base':"",'Collection':""}
-        self.Ancien_base=None
-        self.Ancienne_collection=None
+        self.EltAChanger={'Id':"",'Storage':"",'Base':""}
+        self.Ancien_storage=None
+        self.Ancienne_bases=None
         self.Client=None
-        #Récupération des données depuis la base de données locale MongoDB 
+        #Récupération des données depuis la Storage de données locale MongoDB 
         self.Appel_loading_data()
         #On va centre toutes les données de ma tree view pour un meilleur affichage
         for col in self.tree["columns"]:
@@ -227,39 +231,38 @@ class UserF():
 
     def changerbase(self):
         
-        if self.changeDB_var.get() == 1 and self.EltAChanger['Id']!=None:
-            if self.EltAChanger['Base']=="Cloud":
-                self.Ancien_base=self.EltAChanger['Base'] # On sauvegarde dab la base d'origine
-                self.EltAChanger['Base']= "Locale" 
-            elif self.EltAChanger['Base']=="Locale":
-                self.Ancien_base=self.EltAChanger['Base'] # On sauvegarde dab la base d'origine
-                self.EltAChanger['Base']="Cloud"
-
-            print(self.EltAChanger)
-            print(self.Ancien_base)
-
-        elif self.changeDB_var.get() == 0 and self.EltAChanger['Id']!=None:
-            self.EltAChanger['Base']=self.Ancien_base
-            print(self.Ancien_base)
-            print(self.EltAChanger)
+        if self.changestorage_var.get() == 1 and self.EltAChanger['Id']!=None:
+            self.update_button.config(state="normal")
             
+            if self.EltAChanger['Storage']=="Cloud":
+                self.Ancien_storage=self.EltAChanger['Storage'] # On sauvegarde dab la Storage d'origine
+                self.EltAChanger['Storage']= "Locale" 
+            elif self.EltAChanger['Storage']=="Locale":
+                self.Ancien_storage=self.EltAChanger['Storage'] # On sauvegarde dab la Storage d'origine
+                self.EltAChanger['Storage']="Cloud"
+
+        elif self.changestorage_var.get() == 0 and self.EltAChanger['Id']!=None:
+            self.EltAChanger['Storage']=self.Ancien_storage
+
+        if self.changestorage_var.get() == 0 and self.changebase_var.get() == 0:  
+            self.update_button.config(state="disabled")
 
     def changercollection(self):
         
-        if self.changeCollection_var.get() == 1 and self.EltAChanger['Id']!=None :
-            if self.EltAChanger['Collection']=="Docs en attente":
-                self.Ancienne_collection=self.EltAChanger['Collection']
-                self.EltAChanger['Collection']= "Docs validés" 
-            elif self.EltAChanger['Collection']=="Docs validés":
-                self.Ancienne_collection=self.EltAChanger['Collection']
-                self.EltAChanger['Collection']="Docs en attente"
-            print(self.EltAChanger)
-            print(self.Ancienne_collection)
+        if self.changebase_var.get() == 1 and self.EltAChanger['Id']!=None :
+            self.update_button.config(state="normal")
+            if self.EltAChanger['Base']=="Hypnose_documents_en_attente":
+                self.Ancienne_bases=self.EltAChanger['Base']
+                self.EltAChanger['Base']= "Hypnose_documents_validés" 
+            elif self.EltAChanger['Base']=="Hypnose_documents_validés":
+                self.Ancienne_bases=self.EltAChanger['Base']
+                self.EltAChanger['Base']="Hypnose_documents_en_attente"
 
-        elif self.changeCollection_var.get() == 0 and self.EltAChanger['Id']!=None:
-            self.EltAChanger['Collection']=self.Ancienne_collection
-            print(self.EltAChanger)
-            print(self.Ancienne_collection)
+        elif self.changebase_var.get() == 0 and self.EltAChanger['Id']!=None:
+            self.EltAChanger['Base']=self.Ancienne_bases
+
+        if self.changestorage_var.get() == 0 and self.changebase_var.get() == 0:  
+            self.update_button.config(state="disabled")   
 
     def CheckBoxDB_manage(self):
     # Fonction de rappel pour exécuter lorsque la case à cocher est cochée ou décochée
@@ -325,44 +328,12 @@ class UserF():
         
         # Vérifiez s'il y a des éléments sélectionnés
         if selected_items:
-            # Récupérez le premier élément sélectionné
-            first_selected_item = selected_items[0]
-            # Récupérez les valeurs de chaque colonne pour le premier élément sélectionné
-            values = event.widget.item(first_selected_item, 'values')
-            
-            # Réinitialisation des box
-            self.title_entry.delete(0,END)
-            self.aut_entry.delete(0,END)
-            self.page_entry.delete(0,END)
-            self.type_entry.set("")
-            self.langue_entry.set("")
-            
-            # Affichez les valeurs récupérées
-            date_obj = datetime.strptime(values[0], "%Y-%m-%d")
-            self.de_entry.set_date(date_obj.strftime("%d-%m-%Y"))
-            
-            self.title_entry.insert(0,values[1])          
-            self.aut_entry.insert(0,values[2])
-            self.page_entry.insert(0,values[3])
-            self.type_entry.set(values[4])
-            self.langue_entry.set(values[5])
-            self.EltAChanger['Id']=values[6]
-        
             self.checkbox_ChangeDB.config(state="normal")
             self.checkbox_ChangeCollection.config(state="normal")
         else:
-            
-            # Effacer les valeurs si aucun élément n'est sélectionné
-            self.title_entry.delete(0,END)
-            self.aut_entry.delete(0,END)
-            self.page_entry.delete(0,END)
-            self.type_entry.set("")
-            self.langue_entry.set("")
-
             self.checkbox_ChangeDB.config(state="disabled")
             self.checkbox_ChangeCollection.config(state="disabled")
-
-    
+ 
     def load_files_from_gridfs(self,db):
               
         fs = GridFS(db)
@@ -397,7 +368,8 @@ class UserF():
         elif system == 'Darwin':  # macOS
             subprocess.Popen(['open', file_path])
         else:
-            print("Système d'exploitation non pris en charge.")
+            pass
+           
 
     def display_pdf(self, event):
         
@@ -420,11 +392,9 @@ class UserF():
             with tempfile.NamedTemporaryFile(suffix='.pdf', delete=False) as temp_file:
                 temp_file.write(file_content)
                 temp_file_path = temp_file.name
-                print(temp_file_path)
+                
             # Ouvrir le fichier temporaire avec le lecteur PDF par défaut sur l'ordinateur
             self.open_pdf_file(temp_file_path)
-            
-            self.Client.close # On oublie pas de refermer la connexion
 
     def center_window(self,window_width,window_height):
         screen_width = self.window.winfo_screenwidth()
@@ -443,151 +413,249 @@ class UserF():
     def loading_data(self):
         try:
             if self.basecloud_var.get() == 1 :
-                # Connexion à la base de données
+                
+                # Connexion à la Storage de données
                 self.Client = pymongo.MongoClient("mongodb+srv://sorolassina:2311SLSS@hypnosecluster.5vtl4ex.mongodb.net/")
                
-                self.EltAChanger['Base']="Cloud" 
+                self.EltAChanger['Storage']="Cloud" 
 
                 if self.docattente_var.get() == 1 :
                     self.db=self.Client["Hypnose_documents_en_attente"]
                     self.load_files_from_gridfs(self.db)       
-                    #self.Client.close()
+                    
 
                 elif self.docvalide_var.get() == 1 :
-                    #collection = db["Docs validés"]
-                    self.EltAChanger['Collection']="Docs validés" #On récupère la collection sélectionnée
+                    #Base = db["Hypnose_documents_validés"]
+                    self.EltAChanger['Base']="Hypnose_documents_validés" #On récupère la Base sélectionnée
                      
                     # Exemple d'utilisation pour vider le Treeview
                     self.clear_treeview()
                     # Insertion des données dans le Treeview
                     self.db=self.Client["Hypnose_documents_validés"]
-                    self.load_files_from_gridfs(self.db)
+                    self.load_files_from_gridfs(self.db)                    
                     
-                    #self.Client.close()
                 else:
                     messagebox.showerror("Affichage", "Aucune table n'a été sélectionnée.")
                       
                 
             elif self.baselocale_var.get() == 1 :
-                # Connexion à la base de données
+                # Connexion à la Storage de données
                 self.Client = pymongo.MongoClient("mongodb://localhost:27017/")
-                self.EltAChanger['Base']="Locale" #On récupère la base sélectionnée
+                self.EltAChanger['Storage']="Locale" #On récupère la Storage sélectionnée
 
                 if self.docattente_var.get() == 1 :
-                    #collection = db["Docs en attente"]
-                    self.EltAChanger['Collection']="Docs en attente" #On récupère la collection sélectionnée
+                    
+                    #Base = db["Hypnose_documents_en_attente"]
+                    self.EltAChanger['Base']="Hypnose_documents_en_attente" #On récupère la Base sélectionnée
                     # Exemple d'utilisation pour vider le Treeview
                     self.clear_treeview()
                     # Insertion des données dans le Treeview
                     self.db=self.Client["Hypnose_documents_en_attente"]
-                    self.load_files_from_gridfs(self.db)
-
-                    #self.Client.close()
+                    self.load_files_from_gridfs(self.db)             
 
                 elif self.docvalide_var.get() == 1 :
-                    collection = self.db["Docs validés"]
-                    self.EltAChanger['Collection']="Docs validés" #On récupère la collection sélectionnée
-                    # Récupération de tous les documents dans la collection
-                    cursor = collection.find()
+                    #Base = self.db["Hypnose_documents_validés"]
+                    self.EltAChanger['Base']="Hypnose_documents_validés" #On récupère la Base sélectionnée
+                    # Récupération de tous les documents dans la Base
+                    #cursor = Base.find()
                     # Exemple d'utilisation pour vider le Treeview
                     self.clear_treeview()
 
                     self.db=self.Client["Hypnose_documents_validés"]
                     self.load_files_from_gridfs(self.db)
                     
-                    #self.Client.close()
+                    
                 else:
                     messagebox.showerror("Affichage", "Aucune table n'a été sélectionnée.")
                      
             else:
-                messagebox.showerror("Affichage", "Aucune base n'a été sélectionnée.")
+                messagebox.showerror("Affichage", "Aucune Storage n'a été sélectionnée.")
                  
         except Exception as e:
             messagebox.showerror("Connexion", f"Erreur lors du chargement des données : {e}",parent=self.window)
-            print(e)
+            
    
     def transfer_selected_documents(self):
-        
-        selected_items = self.tree.selection()
-        if selected_items:
-            if  self.changeDB_var.get()==1: # Si le bouton changer de base a été coché
-                # Connexion aux bases de données source et destination
-                if self.EltAChanger['Base']=='Cloud': # On configure la base de données pour se connecter
-                    source_client = pymongo.MongoClient('mongodb+srv://sorolassina:2311SLSS@hypnosecluster.5vtl4ex.mongodb.net/')
-                elif self.EltAChanger['Base']=='Locale':                
-                    destination_client = pymongo.MongoClient("mongodb://localhost:27017/")
 
-                if  self.changeCollection_var.get()==1: # On configure la collection si elle a été changée              
-                    if self.EltAChanger['Collection']=='Hypnose_documents_en_attente':
-                        source_db = source_client['Hypnose_documents_validés']
-                        destination_db = destination_client['Hypnose_documents_en_attente']
+        try:
+            source_client=None
+            destination_client=None
+            source_collect=None
+            destination_collect=None
+            
+            selected_items = self.tree.selection()
+            if selected_items:
 
-                    elif self.EltAChanger['Collection']=='Hypnose_documents_validés':              
-                        source_db = source_client['Hypnose_documents_en_attente']
-                        destination_db = destination_client['Hypnose_documents_validés']
-                    else:
-                        source_db = source_client[self.EltAChanger['Collection']]
-                        destination_db =source_db
+                # ON CHANGE DE LIEU DE STOCKAGE
+                if  self.changestorage_var.get()==1: 
 
-            elif  self.changeDB_var.get()==0: # Si le bouton changer de base a été coché
-                # Connexion aux bases de données source et destination
-                if self.EltAChanger['Base']=='Cloud': # On configure la base de données pour se connecter
-                    source_client = pymongo.MongoClient('mongodb+srv://sorolassina:2311SLSS@hypnosecluster.5vtl4ex.mongodb.net/')
-                elif self.EltAChanger['Base']=='Locale':                
-                    destination_client = pymongo.MongoClient("mongodb://localhost:27017/")
+                    # ON CHANGE EGALEMENT DE BASE ET DE LIEU DE STOCKAGE
+                    if  self.changebase_var.get()==1: # On configure la Base si elle a été changée     
+                       
+                        # DESTINATION CLOUD
+                        if self.EltAChanger['Storage']=='Cloud': # On configure la Storage de données pour se connecter
+                            source_client = pymongo.MongoClient('mongodb://localhost:27017/')
+                            destination_client = pymongo.MongoClient('mongodb+srv://sorolassina:2311SLSS@hypnosecluster.5vtl4ex.mongodb.net/') 
+                            
+                            if self.EltAChanger['Base']=='Hypnose_documents_en_attente':
+                                source_collect = source_client[str(self.Ancienne_bases)]
+                                destination_collect = destination_client['Hypnose_documents_en_attente']
+                            elif self.EltAChanger['Base']=='Hypnose_documents_validés':
+                                source_collect = source_client[str(self.Ancienne_bases)]
+                                destination_collect = destination_client['Hypnose_documents_validés']
+                        
+                        # DESTINATION LOCALE
+                        elif self.EltAChanger['Storage']=='Locale': # On configure la Storage de données pour se connecter
+                            destination_client = pymongo.MongoClient('mongodb://localhost:27017/')
+                            source_client = pymongo.MongoClient('mongodb+srv://sorolassina:2311SLSS@hypnosecluster.5vtl4ex.mongodb.net/') 
+                            
+                            if self.EltAChanger['Base']=='Hypnose_documents_en_attente':
+                                source_collect = source_client[str(self.Ancienne_bases)]
+                                destination_collect = destination_client['Hypnose_documents_en_attente']
+                            elif self.EltAChanger['Base']=='Hypnose_documents_validés':
+                                source_collect = source_client[str(self.Ancienne_bases)]
+                                destination_collect = destination_client['Hypnose_documents_validés']
 
-                if  self.changeCollection_var.get()==1: # On configure la collection si elle a été changée              
-                    if self.EltAChanger['Collection']=='Hypnose_documents_en_attente':
-                        source_db = source_client['Hypnose_documents_validés']
-                        destination_db = destination_client['Hypnose_documents_en_attente']
-
-                    elif self.EltAChanger['Collection']=='Hypnose_documents_validés':              
-                        source_db = source_client['Hypnose_documents_en_attente']
-                        destination_db = destination_client['Hypnose_documents_validés']
-                    else:
-                        source_db = source_client[self.EltAChanger['Collection']]
-                        destination_db =source_db
                     
-            # Récupérer les instances de GridFS
-            source_fs = GridFS(source_db)
-            destination_fs = GridFS(destination_db)
+                    # ON CHANGE DE LIEU DE STOCKAGE ET ON NE CHANGE PAS DE BASE
+                    elif  self.changebase_var.get()==0: # Supposons que la base de stockage ne change pas 
 
-        # Parcourir les documents sélectionnés dans GridFS
-            for item_id in selected_items:
-                # Récupérer le fichier correspondant à l'ID
-                file = source_fs.get(item_id)
+                        # DESTINATION CLOUD
+                        if self.EltAChanger['Storage']=='Cloud': # On configure la Storage de données pour se connecter
+                            source_client = pymongo.MongoClient('mongodb://localhost:27017/')
+                            destination_client = pymongo.MongoClient('mongodb+srv://sorolassina:2311SLSS@hypnosecluster.5vtl4ex.mongodb.net/') 
 
-                if file:
-                    # Vérifier si un fichier avec le même nom existe déjà dans la base de données de destination
-                    existing_file = destination_fs.find_one({'filename': file.filename})
-                    if existing_file:
-                        messagebox.showwarning("Warning", f"File '{file.filename}' already exists in the destination database.")
-                    else:
-                        # Copier le fichier vers la base de données destination
-                        destination_fs.put(file.read(), **file.metadata)
-                        # Supprimer le fichier de la base de données source
-                        source_fs.delete(item_id)
-                else:
-                    messagebox.showwarning("Warning", f"File with ID {item_id} not found.")
+                            if self.EltAChanger['Base']=='Hypnose_documents_en_attente':
+                                source_collect = source_client['Hypnose_documents_en_attente']
+                                destination_collect = destination_client['Hypnose_documents_en_attente']
+                            elif self.EltAChanger['Base']=='Hypnose_documents_validés':
+                                source_collect = source_client['Hypnose_documents_validés']
+                                destination_collect = destination_client['Hypnose_documents_validés']
 
+                        # DESTINATION LOCALE
+                        elif self.EltAChanger['Storage']=='Locale': # On configure la Storage de données pour se connecter                            
+                            source_client = pymongo.MongoClient('mongodb+srv://sorolassina:2311SLSS@hypnosecluster.5vtl4ex.mongodb.net/') 
+                            destination_client = pymongo.MongoClient('mongodb://localhost:27017/')
 
-            # Fermer les connexions
-            source_client.close()
-            destination_client.close()
-   
+                            if self.EltAChanger['Base']=='Hypnose_documents_en_attente':
+                                source_collect = source_client['Hypnose_documents_en_attente']
+                                destination_collect = destination_client['Hypnose_documents_en_attente']
+                            elif self.EltAChanger['Base']=='Hypnose_documents_validés':
+                                source_collect = source_client['Hypnose_documents_validés']
+                                destination_collect = destination_client['Hypnose_documents_validés']
+
+                # ON NE CHANGE PAS DE STORAGE
+                elif  self.changestorage_var.get()==0: # Si le bouton changer de Storage a été coché
+
+                    # ON NE CHANGE PAS DE STORAGE MAIS ON CHANGE DE BASE
+                    if  self.changebase_var.get()==1: # On configure la Base si elle a été changée     
+                       
+                        # Si la destination est le cloud
+                        if self.EltAChanger['Storage']=='Cloud': # On configure la Storage de données pour se connecter
+                            source_client = pymongo.MongoClient('mongodb+srv://sorolassina:2311SLSS@hypnosecluster.5vtl4ex.mongodb.net/')
+                            destination_client = pymongo.MongoClient('mongodb+srv://sorolassina:2311SLSS@hypnosecluster.5vtl4ex.mongodb.net/') 
+                            
+                            if self.EltAChanger['Base']=='Hypnose_documents_en_attente':
+                                source_collect = source_client[str(self.Ancienne_bases)]
+                                destination_collect = destination_client['Hypnose_documents_en_attente']
+                            elif self.EltAChanger['Base']=='Hypnose_documents_validés':
+                                source_collect = source_client[str(self.Ancienne_bases)]
+                                destination_collect = destination_client['Hypnose_documents_validés']
+                        
+                        # Si la destinatination est le local
+                        elif self.EltAChanger['Storage']=='Locale': # On configure la Storage de données pour se connecter
+                            source_client = pymongo.MongoClient('mongodb://localhost:27017/')
+                            destination_client = pymongo.MongoClient('mongodb://localhost:27017/') 
+
+                            if self.EltAChanger['Base']=='Hypnose_documents_en_attente':
+                                source_collect = source_client[str(self.Ancienne_bases)]
+                                destination_collect = destination_client['Hypnose_documents_en_attente']
+                            elif self.EltAChanger['Base']=='Hypnose_documents_validés':
+                                source_collect = source_client[str(self.Ancienne_bases)]
+                                destination_collect = destination_client['Hypnose_documents_validés']
+
+                     # ON NE CHANGE PAS DE STORAGE ET ON NE CHANGE PAS DE BASE
+                    elif  self.changebase_var.get()==0: # Supposons que la base de stockage ne change pas 
+
+                        # Si la destination est le cloud
+                        if self.EltAChanger['Storage']=='Cloud': # On configure la Storage de données pour se connecter
+                            source_client = pymongo.MongoClient('mongodb+srv://sorolassina:2311SLSS@hypnosecluster.5vtl4ex.mongodb.net/')
+                            destination_client = pymongo.MongoClient('mongodb+srv://sorolassina:2311SLSS@hypnosecluster.5vtl4ex.mongodb.net/') 
+
+                            if self.EltAChanger['Base']=='Hypnose_documents_en_attente':
+                                source_collect = source_client['Hypnose_documents_en_attente']
+                                destination_collect = destination_client['Hypnose_documents_en_attente']
+                            elif self.EltAChanger['Base']=='Hypnose_documents_validés':
+                                source_collect = source_client['Hypnose_documents_validés']
+                                destination_collect = destination_client['Hypnose_documents_validés'] 
+
+                        # Si la destinatination est le local
+                        elif self.EltAChanger['Storage']=='Locale': # On configure la Storage de données pour se connecter
+                            source_client = pymongo.MongoClient('mongodb://localhost:27017/')
+                            destination_client = pymongo.MongoClient('mongodb://localhost:27017/') 
+
+                            if self.EltAChanger['Base']=='Hypnose_documents_en_attente':
+                                source_collect = source_client['Hypnose_documents_en_attente']
+                                destination_collect = destination_client['Hypnose_documents_en_attente']
+                            elif self.EltAChanger['Base']=='Hypnose_documents_validés':
+                                source_collect = source_client['Hypnose_documents_validés']
+                                destination_collect = destination_client['Hypnose_documents_validés']
+
+                # Récupérer les instances de GridFS               
+
+                source_fs = GridFS(source_collect)
+                destination_fs = GridFS(destination_collect)
+
+                selected_item = self.tree.selection()
+                if selected_item:
+                    for item in selected_item:
+                        # Récupérer l'index de chaque élément
+                        # Récupérer les valeurs de chaque élément
+                        values = self.tree.item(item, 'values')
+                        id=values[6]
+                        
+                        # Convertir l'ID en un objet ObjectId
+                        object_id = ObjectId(id)
+                        
+                        file = source_fs.find_one({'_id': object_id})
+                        filename = file.metadata.get('filename', 'N/A')
+                        #file = source_fs.get(object_id_str)
+                        
+                        if file:
+                            # Vérifier si un fichier avec le même nom existe déjà dans la Storage de données de destination
+                            existing_file = destination_fs.find_one({'filename': filename})
+                            if existing_file:
+                                messagebox.showwarning("Warning", f"File '{filename}' already exists in the destination database.")
+                            else:
+                                # Copier le fichier vers la Storage de données destination
+                                destination_fs.put(file.read(), metadata=file.metadata)
+                                # Supprimer le fichier de la Storage de données source
+                                source_fs.delete(object_id)
+                        else:
+                            messagebox.showwarning("Warning", f"File with ID {filename} not found.")
+
+                # Fermer les connexions
+                source_client.close()
+                destination_client.close()
+                self.Appel_loading_data()
+        except Exception as e:
+            messagebox.showerror("Connexion", f"Erreur de connexion : {e}",parent=self.window)
+       
+    
+       
     def ModifyorCreate(self):
         try:
             if self.basecloud_var.get() == 1:
-                # Connexion à la base de données
+                # Connexion à la Storage de données
                 self.Client = pymongo.MongoClient("mongodb+srv://sorolassina:2311SLSS@hypnosecluster.5vtl4ex.mongodb.net/")
                 db=self.Client["Cloud"]
-                self.EltAChanger['Base']="Cloud" 
+                self.EltAChanger['Storage']="Cloud" 
 
                 if self.docattente_var.get() == 1 :
-                    collection = db["Docs en attente"]
-                    self.EltAChanger['Collection']="Docs en attente" #On récupère la collection sélectionnée
-                    # Récupération de tous les documents dans la collection
-                    cursor = collection.find()
+                    Base = db["Hypnose_documents_en_attente"]
+                    self.EltAChanger['Base']="Hypnose_documents_en_attente" #On récupère la Base sélectionnée
+                    # Récupération de tous les documents dans la Base
+                    cursor = Base.find()
                     # Exemple d'utilisation pour vider le Treeview
                     self.clear_treeview()
                     # Insertion des données dans le Treeview
@@ -598,10 +666,10 @@ class UserF():
                     self.Client.close()
 
                 elif self.docvalide_var.get() == 1 :
-                    collection = db["Docs validés"]
-                    self.EltAChanger['Collection']="Docs validés" #On récupère la collection sélectionnée
-                    # Récupération de tous les documents dans la collection
-                    cursor = collection.find()
+                    Base = db["Hypnose_documents_validés"]
+                    self.EltAChanger['Base']="Hypnose_documents_validés" #On récupère la Base sélectionnée
+                    # Récupération de tous les documents dans la Base
+                    cursor = Base.find()
                     # Exemple d'utilisation pour vider le Treeview
                     self.clear_treeview()
                     # Insertion des données dans le Treeview
@@ -614,16 +682,16 @@ class UserF():
                     messagebox.showerror("Affichage", "Aucune table n'a été sélectionnée.")
                                       
             elif self.baselocale_var.get() == 1 :
-                # Connexion à la base de données
+                # Connexion à la Storage de données
                 self.Client = pymongo.MongoClient("mongodb://localhost:27017/")
                 db=self.Client["Locale"]
-                self.EltAChanger['Base']="Locale" #On récupère la base sélectionnée
+                self.EltAChanger['Storage']="Locale" #On récupère la Storage sélectionnée
 
                 if self.docattente_var.get() == 1 :
-                    collection = db["Docs en attente"]
-                    self.EltAChanger['Collection']="Docs en attente" #On récupère la collection sélectionnée
-                    # Récupération de tous les documents dans la collection
-                    cursor = collection.find()
+                    Base = db["Hypnose_documents_en_attente"]
+                    self.EltAChanger['Base']="Hypnose_documents_en_attente" #On récupère la Base sélectionnée
+                    # Récupération de tous les documents dans la Base
+                    cursor = Base.find()
                     # Exemple d'utilisation pour vider le Treeview
                     self.clear_treeview()
                     # Insertion des données dans le Treeview
@@ -634,10 +702,10 @@ class UserF():
                     self.Client.close()
 
                 elif self.docvalide_var.get() == 1 :
-                    collection = db["Docs validés"]
-                    self.EltAChanger['Collection']="Docs validés" #On récupère la collection sélectionnée
-                    # Récupération de tous les documents dans la collection
-                    cursor = collection.find()
+                    Base = db["Hypnose_documents_validés"]
+                    self.EltAChanger['Base']="Hypnose_documents_validés" #On récupère la Base sélectionnée
+                    # Récupération de tous les documents dans la Base
+                    cursor = Base.find()
                     # Exemple d'utilisation pour vider le Treeview
                     self.clear_treeview()
                     
@@ -650,11 +718,11 @@ class UserF():
                     messagebox.showerror("Affichage", "Aucune table n'a été sélectionnée.")
                      
             else:
-                messagebox.showerror("Affichage", "Aucune base n'a été sélectionnée.")
+                messagebox.showerror("Affichage", "Aucune Storage n'a été sélectionnée.")
                  
         except Exception as e:
             messagebox.showerror("Connexion", f"Erreur lors du chargement des données : {e}",parent=self.window)
-            print(e)
+            
 
     
     def clear_treeview(self):
