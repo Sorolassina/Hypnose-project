@@ -197,7 +197,7 @@ class UserF():
         create_button.place(x=970, y=20)    
         self.update_button = Button(Cadre_bouton, width=20,text="Transférer",font=myFontBouton, command=self.transfer_selected_documents,state="disabled",cursor="hand2")
         self.update_button.place(x=8, y=180) 
-        delete_button = Button(Cadre_bouton, width=20,text="Supprimer",font=myFontBouton, command="",cursor="hand2")
+        delete_button = Button(Cadre_bouton, width=20,text="Supprimer",font=myFontBouton, command=self.remove_file,cursor="hand2")
         delete_button.place(x=8, y=270)
         self.lookvalue_entry = ttk.Entry(zone1, background='#FFFFFF')
         self.lookvalue_entry.place(x=310, y=20,width=500,height=28) 
@@ -729,6 +729,22 @@ class UserF():
         # Supprimer toutes les lignes du Treeview
         for item in self.tree.get_children():
             self.tree.delete(item)
+
+
+    def remove_file(self):
+        # Récupérer l'élément sélectionné dans le Treeview
+        selected_items = self.tree.selection()
+        if not selected_items:
+            messagebox.showwarning("Avertissement", "Veuillez sélectionner un fichier à supprimer.")
+            return
+        else:
+
+            if messagebox.askyesno("Avertissement", "Voulez-vous supprimer ces fichier des documents de votre base ?") :              
+                # Supprimer chaque élément sélectionné du Treeview
+                for item in selected_items:
+                    # Supprimer l'élément du Treeview
+                    self.tree.delete(item)
+
 
 if __name__ == "__main__":
     app = UserF()

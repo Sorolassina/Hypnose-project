@@ -109,7 +109,7 @@ class Login ():
             
             try:
                 client = pymongo.MongoClient("mongodb://localhost:27017/")
-                db = client["Hypnose_base"]
+                db = client["Hypnose_manager"]
                 if db is not None:
                     collection = db["Manage_Users"]
                     result = collection.find_one({"Email": username,"Mot de passe": password})
@@ -134,38 +134,41 @@ class Login ():
         if email is not None:
             try:
                 client = pymongo.MongoClient("mongodb://localhost:27017/")
-                db = client["Hypnose_base"]
+                db = client["Hypnose_manager"]
                 collection = db["Manage_Users"]
                 row_MDB = collection.find_one({"Email": email})
             
                 if row_MDB != None:                    
-                    reponse = simpledialog.askstring("Question", f"{row_MDB["Question"]}:",parent=self.root) 
+                    reponse = simpledialog.askstring("Question", f"{row_MDB["Question"]}:",parent=self.root)
 
-                    if reponse==row_MDB["Reponse"]:
-                        new_password = simpledialog.askstring("Connexion", "Veuillez saisir votre nouveau mot de passe:",parent=self.root)  
-                        # Critères de recherche pour trouver le document à mettre à jour
-                        critere_recherche = {"_id": row_MDB["_id"]}
-                        # Opération de mise à jour à appliquer sur le document
-                        operation_mise_a_jour = {"$set": {"Mot de passe": new_password}}
-                        # Utilisation de find_one_and_update() pour trouver et mettre à jour le document
-                        document_mis_a_jour = collection.find_one_and_update(
-                                                                            critere_recherche,  # Critères de recherche
-                                                                            operation_mise_a_jour # Opération de mise à jour 
-                                                                            )                 
-                        # Définir les détails de l'e-mail
-                        sender_email = 'sorolassina58@gmail.com'
-                        sender_password ="mxcu kxhv jwym staa"
-                        receiver_email = email
-                        subject = 'Votre mot de passe Hypnose a été réinitialisé'
-                        message = f"Bonjour {row_MDB["Nom"]} {row_MDB["Prénoms"]},\n\nVotre mot de passe a été récemment réinitialisé. \
-                                        \nSi vous êtes l'auteur de cette réinitialisation, considérez ce message à titre d'information uniquement.\
-                                        \n\nSi vous n'êtes pas certain que vous ou votre administratrice êtes l'auteur de cette réinitialisation, contactez votre administratrice immédiatement. \
-                                        \n\nCordialement, \n\n\nL'équipe d'Hypnose."
-                        self.send_email(sender_email, sender_password, receiver_email, subject, message)
-                        messagebox.showinfo("MaJ", f"Un email a été envoyé à {email}.",parent=self.root)
-                        
-                    else:
+                    if reponse is not None: 
+
+                        if reponse==row_MDB["Reponse"]:
+                            new_password = simpledialog.askstring("Connexion", "Veuillez saisir votre nouveau mot de passe:",parent=self.root)  
+                            # Critères de recherche pour trouver le document à mettre à jour
+                            critere_recherche = {"_id": row_MDB["_id"]}
+                            # Opération de mise à jour à appliquer sur le document
+                            operation_mise_a_jour = {"$set": {"Mot de passe": new_password}}
+                            # Utilisation de find_one_and_update() pour trouver et mettre à jour le document
+                            document_mis_a_jour = collection.find_one_and_update(
+                                                                                critere_recherche,  # Critères de recherche
+                                                                                operation_mise_a_jour # Opération de mise à jour 
+                                                                                )                 
+                            # Définir les détails de l'e-mail
+                            sender_email = 'sorolassina58@gmail.com'
+                            sender_password ="mxcu kxhv jwym staa"
+                            receiver_email = email
+                            subject = 'Votre mot de passe Hypnose a été réinitialisé'
+                            message = f"Bonjour {row_MDB["Nom"]} {row_MDB["Prénoms"]},\n\nVotre mot de passe a été récemment réinitialisé. \
+                                            \nSi vous êtes l'auteur de cette réinitialisation, considérez ce message à titre d'information uniquement.\
+                                            \n\nSi vous n'êtes pas certain que vous ou votre administratrice êtes l'auteur de cette réinitialisation, contactez votre administratrice immédiatement. \
+                                            \n\nCordialement, \n\n\nL'équipe d'Hypnose."
+                            self.send_email(sender_email, sender_password, receiver_email, subject, message)
+                            messagebox.showinfo("MaJ", f"Un email a été envoyé à {email}.",parent=self.root)
+    
+                        elif reponse!=row_MDB["Reponse"]:
                             messagebox.showerror("Mot de passe oublié", "Réponse incorrecte. \nVeuillez contacter l'Administratrice.",parent=self.root) 
+                         
                 else:
                     messagebox.showerror("Mot de passe oublié", "Nous ne parvenons pas à trouver cet utilisateur. \nSi le problème persiste, veuillez contacter l'Administratrice.",parent=self.root) 
                 
@@ -181,23 +184,23 @@ class Login ():
         if email is not None:  
             try:
                 client = pymongo.MongoClient("mongodb://localhost:27017/")
-                db = client["Hypnose_base"]
+                db = client["Hypnose_manager"]
                 collection = db["Manage_Users"]
                 row_MDB = collection.find_one({"Email": email})
 
                 if row_MDB != None: 
-
                     reponse = simpledialog.askstring("Question", f"{row_MDB["Question"]}:",parent=self.root)
+                    if email is not None: 
 
-                    if reponse ==row_MDB["Reponse"] : 
-                        reponse = simpledialog.askstring("Modification", "Veuillez saisir votre mot de passe:",parent=self.root)
-                        if reponse ==row_MDB["Mot de passe"] : 
-                            user_info = row_MDB  # Remplacez ceci par les informations de l'utilisateur                      
-                            app = CreateLog(self.root,user_info) 
+                        if reponse ==row_MDB["Reponse"] : 
+                            reponse = simpledialog.askstring("Modification", "Veuillez saisir votre mot de passe:",parent=self.root)
+                            if reponse ==row_MDB["Mot de passe"] : 
+                                user_info = row_MDB  # Remplacez ceci par les informations de l'utilisateur                      
+                                app = CreateLog(self.root,user_info) 
+                            else:
+                                messagebox.showerror("Modification", "Oups! Mauvais mot de passe.",parent=self.root)
                         else:
-                            messagebox.showerror("Modification", "Oups! Mauvais mot de passe.",parent=self.root)
-                    else:
-                        messagebox.showerror("Modification", "Oups! Mauvaise réponse.",parent=self.root) 
+                            messagebox.showerror("Modification", "Oups! Mauvaise réponse.",parent=self.root) 
                 
                 else:
                     messagebox.showerror("Connexion", "Désolez nous ne parvenons pas à retrouver cet utilisateur.",parent=self.root)
@@ -244,7 +247,7 @@ class Login ():
             try:
                 # Se connecter à la base de données MongoDB
                 client = pymongo.MongoClient("mongodb://localhost:27017/")
-                db = client["Hypnose_base"]
+                db = client["Hypnose_manager"]
                 collection = db["Manage_Users"]
                 
                 # On recherche l'adresse dans la base
@@ -286,7 +289,7 @@ class Login ():
             try: 
                 # Se connecter à la base de données MongoDB
                 client = pymongo.MongoClient("mongodb://localhost:27017/")
-                db = client["Hypnose_base"]
+                db = client["Hypnose_manager"]
                 collection = db["Manage_Users"]
                 
                 # On recherche l'adresse dans la base
