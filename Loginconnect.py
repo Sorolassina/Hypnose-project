@@ -13,8 +13,8 @@ from tkinter.font import Font
 
 class Login ():
    
-    def __init__(self):
-        self.root = Tk()
+    def __init__(self, root):
+        self.root = root
         self.root.title("HYPNOSE DataBase Manager")
         self.root.iconbitmap('logo2.ico')
         self.root.configure(bg="white")  
@@ -54,8 +54,9 @@ class Login ():
         self.password_entry = Entry(zone1,show="*", width=20,font=Font(size=14))
         self.password_entry.place(x=220, y=130)
         # Limiter la longueur de l'entrée à 10 caractères
-        self.password_entry.bind("<FocusOut>", self.validate_password)
-        
+        #self.password_entry.bind("<FocusOut>", self.validate_password)
+        # command=self.validate_login
+
         self.login_button = Button(zone1, text="Valider",font=myFontBouton, bg="#39111C",fg="white",command=self.validate_login, width=10,cursor="hand2",activebackground="white", activeforeground="black")              
         self.login_button.place(width=190,x=500,y=70)
         self.forgot_password_button = Button(zone1, text="Mot de passe oublié ?",font=myFontBouton,bg="#39111C",fg="white", command=self.forgot_password,cursor="hand2",activebackground="white", activeforeground="black")
@@ -79,56 +80,7 @@ class Login ():
         textbox.delete(0, END)
         # Insérer le texte formaté dans le Entry
         textbox.insert(0, formatted_text)
-    
-    def validate_password(self, event):
-        new_text = event.widget.get()
-             
-        # Vérification de la présence de caractères spéciaux, de majuscules, de minuscules et de chiffres
-        has_special = any(char for char in new_text if char in "!@#$%^&*()-_=+[{]}|;:',<.>/?")
-        has_upper = any(char for char in new_text if char.isupper())
-        has_lower = any(char for char in new_text if char.islower())
-        has_digit = any(char for char in new_text if char.isdigit())
-        
-        if has_special and has_upper and has_lower and has_digit and len(new_text) >= 10:
-            # Si tous les critères de validation sont satisfaits, la validation réussit
-            return True
-        else:
-            # Sinon, afficher un message d'erreur ou prendre toute autre action nécessaire
-            messagebox.showerror("Erreur", "Le mot de passe doit être au moins de 10 caractères et contenir au moins 1 caractère spécial, 1 majuscule, 1 minuscule et 1 chiffre.")
-            self.password_entry.delete(0,END)
-            # Pour empêcher le focus de quitter le champ tant que la validation n'est pas réussie
-            return False
- 
-    def validate_login(self):
-        username = self.username_entry.get()
-        password = self.password_entry.get()
-        
-        if username=="" or password=="":
-            messagebox.showerror("Connexion", "Nous avons besoin que vous renseignez toutes les zones de saisie.",parent=self.root)      
-        else :
-            
-            try:
-                client = pymongo.MongoClient("mongodb://localhost:27017/")
-                db = client["Hypnose_manager"]
-                if db is not None:
-                    collection = db["Manage_Users"]
-                    result = collection.find_one({"Email": username,"Mot de passe": password})
-                    
-                    if result is not None:
-                        messagebox.showinfo("Connexion", f"“Bienvenue, {result['Nom']} {result['Prénoms']}.”",parent=self.root)
-                        app = UserF()
-                        #app.window.mainloop()
-                        self.root.destroy()
-                        
-                    else:
-                        messagebox.showerror("Connexion", "“Avez-vous oublié votre nom utilisateur et/ou mot de passe ?”",parent=self.root)
-                        self.username_entry.focus_set()
-                        self.username_entry.delete(0,END)
-                        self.password_entry.delete(0,END)
-
-            except Exception as ex:
-                messagebox.showerror("Connexion",f"Oups! Nous avons rencontré pour nous connecter : {str(ex)}",parent=self.root)       
-                           
+              
     def forgot_password(self):
         email = simpledialog.askstring("Connexion", "Veuillez entrer votre nom utilisateur :",parent=self.root)
         if email is not None:
@@ -328,6 +280,58 @@ class Login ():
     def run(self):
         self.root.mainloop()
 
-if __name__ == "__main__":
-    app = Login()
-    app.run()
+
+    def validate_login(self):
+        username = self.username_entry.get()
+        password = self.password_entry.get()
+        
+        if username=="" or password=="":
+            messagebox.showerror("Connexion", "Nous avons besoin que vous renseignez toutes les zones de saisie.",parent=self.root)      
+        else :
+            
+            try:
+                client = pymongo.MongoClient("mongodb://localhost:27017/")
+                db = client["Hypnose_manager"]
+                if db is not None:
+                    collection = db["Manage_Users"]
+                    result = collection.find_one({"Email": username,"Mot de passe": password})
+                    
+                    if result is not None:
+                        messagebox.showinfo("Connexion", f"“Bienvenue, {result['Nom']} {result['Prénoms']}.”",parent=self.root)
+                        self.root.destroy()
+                        user_window = UserF()
+                        #app.window.mainloop()
+                        
+                        
+                    else:
+                        messagebox.showerror("Connexion", "“Avez-vous oublié votre nom utilisateur et/ou mot de passe ?”",parent=self.root)
+                        self.username_entry.focus_set()
+                        self.username_entry.delete(0,END)
+                        self.password_entry.delete(0,END)
+
+            except Exception as ex:
+                messagebox.showerror("Connexion",f"Oups! Nous avons rencontré pour nous connecter : {str(ex)}",parent=self.root)       
+    
+    """ def validate_password(self, event):
+        new_text = event.widget.get()
+             
+        # Vérification de la présence de caractères spéciaux, de majuscules, de minuscules et de chiffres
+        has_special = any(char for char in new_text if char in "!@#$%^&*()-_=+[{]}|;:',<.>/?")
+        has_upper = any(char for char in new_text if char.isupper())
+        has_lower = any(char for char in new_text if char.islower())
+        has_digit = any(char for char in new_text if char.isdigit())
+        
+        if has_special and has_upper and has_lower and has_digit and len(new_text) >= 10:
+            # Si tous les critères de validation sont satisfaits, la validation réussit
+            return True
+        else:
+            # Sinon, afficher un message d'erreur ou prendre toute autre action nécessaire
+            messagebox.showerror("Erreur", "Le mot de passe doit être au moins de 10 caractères et contenir au moins 1 caractère spécial, 1 majuscule, 1 minuscule et 1 chiffre.")
+            self.password_entry.delete(0,END)
+            # Pour empêcher le focus de quitter le champ tant que la validation n'est pas réussie
+            return False """   
+            
+
+#if __name__ == "__main__":
+    #app = Login()
+    #app.run()

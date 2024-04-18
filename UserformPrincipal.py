@@ -21,7 +21,7 @@ from bson import ObjectId
 
 class UserF():
     def __init__(self):
-        self.window=Tk()     
+        self.window=tk.Tk()     
         self.window.title("Hypnose Data Manager")
         self.window.iconbitmap('logo2.ico')
         self.window.configure(bg="white")
@@ -35,7 +35,6 @@ class UserF():
         self.window.resizable(False, False)
         self.window.focus_force()
         
-
         # Création d'un style pour les widgets de thème
         self.style = ttk.Style()
         # Configuration du style pour arrondir les bordures du Frame
@@ -228,6 +227,8 @@ class UserF():
         #On va centre toutes les données de ma tree view pour un meilleur affichage
         for col in self.tree["columns"]:
             self.tree.column(col, anchor="center")
+
+        self.window.mainloop()
 
     def changerbase(self):
         
@@ -473,8 +474,7 @@ class UserF():
                  
         except Exception as e:
             messagebox.showerror("Connexion", f"Erreur lors du chargement des données : {e}",parent=self.window)
-            
-   
+              
     def transfer_selected_documents(self):
 
         try:
@@ -600,7 +600,10 @@ class UserF():
                             elif self.EltAChanger['Base']=='Hypnose_documents_validés':
                                 source_collect = source_client['Hypnose_documents_validés']
                                 destination_collect = destination_client['Hypnose_documents_validés']
-
+                # Délection les checkboxes sélectionnés
+                self.checkbox_ChangeDB.state(['!selected'])
+                self.checkbox_ChangeCollection.state(['!selected'])
+                
                 # Récupérer les instances de GridFS               
 
                 source_fs = GridFS(source_collect)
@@ -640,9 +643,7 @@ class UserF():
                 self.Appel_loading_data()
         except Exception as e:
             messagebox.showerror("Connexion", f"Erreur de connexion : {e}",parent=self.window)
-       
-    
-       
+             
     def ModifyorCreate(self):
         try:
             if self.basecloud_var.get() == 1:
@@ -722,14 +723,11 @@ class UserF():
                  
         except Exception as e:
             messagebox.showerror("Connexion", f"Erreur lors du chargement des données : {e}",parent=self.window)
-            
-
-    
+                
     def clear_treeview(self):
         # Supprimer toutes les lignes du Treeview
         for item in self.tree.get_children():
             self.tree.delete(item)
-
 
     def remove_file(self):
         # Récupérer l'élément sélectionné dans le Treeview
@@ -746,6 +744,10 @@ class UserF():
                     self.tree.delete(item)
 
 
-if __name__ == "__main__":
-    app = UserF()
-    app.window.mainloop()
+#if __name__ == "__main__":
+    #app = UserF()
+    #app.window.mainloop()
+#if __name__ == "__main__":
+    #root = tk.Tk()
+    #login_window = Login(root)
+    #root.mainloop()

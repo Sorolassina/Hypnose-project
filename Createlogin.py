@@ -37,7 +37,7 @@ class CreateLog ():
         zone1=ttk.Frame(self.root,style='RoundedFrame.TFrame')
         self.zone1=zone1
         self.zone1.place(x=250,y=100,width=700,height=250)
-        titreZone=Label(self.zone1,text="Utilisateur",bg="#8c1959",font=myFontTitle,justify="center",anchor="n")
+        titreZone=Label(self.zone1,text="Utilisateur",bg="#8c1959",font=myFontTitle,fg="white",justify="center",anchor="n")
         titreZone.place(relx=0.5, rely=0.02, anchor="n")
       
        # Nom 
