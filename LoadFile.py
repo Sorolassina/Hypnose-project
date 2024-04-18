@@ -164,7 +164,6 @@ class App():
             messagebox.showinfo("Upload", "Merci de sélectionner une base.")
             return
 
-
         processed_files = 0
         # Parcourir tous les éléments du Treeview
         for item in self.tree.get_children():

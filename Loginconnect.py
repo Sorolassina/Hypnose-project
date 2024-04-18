@@ -10,14 +10,15 @@ from Createlogin import CreateLog
 from UserformPrincipal import UserF
 from tkinter import ttk
 from tkinter.font import Font
+from Config import *
 
 class Login ():
    
     def __init__(self, root):
         self.root = root
-        self.root.title("HYPNOSE DataBase Manager")
-        self.root.iconbitmap('logo2.ico')
-        self.root.configure(bg="white")  
+        self.root.title(str(para_generaux['app_name']) + " " + "version"+str(para_generaux['version'])) 
+        self.root.iconbitmap(str(images['icone_application'])) 
+        self.root.configure(bg="white")     
         self.window_width = 1380
         self.window_height = 780
         self.center_window(self.window_width,self.window_height)
@@ -70,6 +71,8 @@ class Login ():
         font_italic = tkFont.Font(family="Arial", size=13, slant="italic",underline=True)
         mod_userinfo_button = Button(zone1, text="Modifier vos informations ici !",fg="white",bg="#8c1959", borderwidth=0,font=font_italic, command=self.modification_InfoUser,cursor="hand2")
         mod_userinfo_button.place(x=210, y=180)  
+
+        self.connnexion_local=str(database_local['host'])+str(database_local['port'])+'/'
          
     def on_text_change(self,event,textbox):
         # Récupérer le texte saisi dans le Entry
@@ -85,8 +88,8 @@ class Login ():
         email = simpledialog.askstring("Connexion", "Veuillez entrer votre nom utilisateur :",parent=self.root)
         if email is not None:
             try:
-                client = pymongo.MongoClient("mongodb://localhost:27017/")
-                db = client["Hypnose_manager"]
+                client = pymongo.MongoClient(self.connnexion_local) # "mongodb://localhost:27017/"
+                db = client[str(database_local['db_Users_name'])]
                 collection = db["Manage_Users"]
                 row_MDB = collection.find_one({"Email": email})
             
