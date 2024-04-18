@@ -47,7 +47,7 @@ class Login ():
         username_label.place(x=40, y=90)
         self.username_entry = Entry(zone1, width=20,font=Font(size=14))
         self.username_entry.place(x=220, y=90)
-        self.username_entry.bind("<KeyRelease>", lambda event: self.on_text_change(event, self.username_entry))
+        #self.username_entry.bind("<KeyRelease>", lambda event: self.on_text_change(event, self.username_entry))
 
         password_label = Label(zone1, text="Mot de passe ", bg="#8c1959", font=myFontLabel, fg="white")
         password_label.place(x=40, y=130)
@@ -279,7 +279,6 @@ class Login ():
     
     def run(self):
         self.root.mainloop()
-
 
     def validate_login(self):
         username = self.username_entry.get()

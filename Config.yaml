@@ -1,0 +1,37 @@
+# Paramètres généraux
+app_name: Hypnose_Data Manager
+version: 1.0
+auteur: Soro W. Lassina
+sender_email : 'sorolassina58@gmail.com'
+sender_password : "mxcu kxhv jwym staa"
+
+# Configurer le serveur SMTP pour Gmail
+smtp_server : 'smtp.gmail.com'
+smtp_port : 587  # Port SMTP pour Gmail
+
+# Paramètres de connexion à la base de données
+database_local:
+  host: mongodb://localhost:27017/
+  port: 27017
+  username: user
+  password: ''
+  db_Users_name: Hypnose_manager
+  db_users_table: Manage_Users
+  db_valide_table: Hypnose_documents_validés
+  db_attente_table: Hypnose_documents_en_attente
+
+database_cloud:
+  host: mongodb://localhost:27017/
+  port: 27017
+  username: user
+  password: ''
+  db_Users_name: Hypnose_manager
+  db_users_table: Manage_Users
+  db_valide_table: Hypnose_documents_validés
+  db_attente_table: Hypnose_documents_en_attente
+
+# Image background 
+icone_application : "./images/gramm1.png"
+background_login : "./icones/logo2.ico"
+background_createlog : "./images/logo2.png"
+

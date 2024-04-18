@@ -290,8 +290,6 @@ class App():
         self.progress_bar['value'] = 0
         self.titrebar_label.config(text="")
 
-    
-
     def extract_metadata(self,file):
         metadata = {}
         pdf_document = fitz.open(file)
