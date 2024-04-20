@@ -90,7 +90,7 @@ class Login ():
             try:
                 client = pymongo.MongoClient(self.connnexion_local) # "mongodb://localhost:27017/"
                 db = client[str(database_local['db_Users_name'])]
-                collection = db["Manage_Users"]
+                collection = db[str(database_local['db_users_table'])]
                 row_MDB = collection.find_one({"Email": email})
             
                 if row_MDB != None:                    
@@ -109,9 +109,10 @@ class Login ():
                                                                                 critere_recherche,  # Critères de recherche
                                                                                 operation_mise_a_jour # Opération de mise à jour 
                                                                                 )                 
+                        
                             # Définir les détails de l'e-mail
-                            sender_email = 'sorolassina58@gmail.com'
-                            sender_password ="mxcu kxhv jwym staa"
+                            sender_email = para_smtp['sender_email']
+                            sender_password =para_smtp['sender_password']
                             receiver_email = email
                             subject = 'Votre mot de passe Hypnose a été réinitialisé'
                             message = f"Bonjour {row_MDB["Nom"]} {row_MDB["Prénoms"]},\n\nVotre mot de passe a été récemment réinitialisé. \
@@ -138,9 +139,10 @@ class Login ():
         email = simpledialog.askstring("Modification", "Veuillez saisir votre nom utilisateur:",parent=self.root)
         if email is not None:  
             try:
-                client = pymongo.MongoClient("mongodb://localhost:27017/")
-                db = client["Hypnose_manager"]
-                collection = db["Manage_Users"]
+                client =pymongo.MongoClient(self.connnexion_local) #pymongo.MongoClient("mongodb://localhost:27017/")
+                db = client[str(database_local['db_Users_name'])] #client["Hypnose_manager"]
+                collection = db[str(database_local['db_users_table'])]
+
                 row_MDB = collection.find_one({"Email": email})
 
                 if row_MDB != None: 
@@ -172,8 +174,8 @@ class Login ():
         
     def send_email(self,sender_email, sender_password, receiver_email, subject, message):
         # Configurer le serveur SMTP pour Gmail
-        smtp_server = 'smtp.gmail.com'
-        smtp_port = 587  # Port SMTP pour Gmail
+        smtp_server = para_smtp['smtp_server']
+        smtp_port = para_smtp['smtp_port']  # Port SMTP pour Gmail
 
         # Créer un objet MIMEMultipart
         msg = MIMEMultipart()
@@ -201,9 +203,14 @@ class Login ():
 
             try:
                 # Se connecter à la base de données MongoDB
-                client = pymongo.MongoClient("mongodb://localhost:27017/")
-                db = client["Hypnose_manager"]
-                collection = db["Manage_Users"]
+                client =pymongo.MongoClient(self.connnexion_local) #pymongo.MongoClient("mongodb://localhost:27017/")
+                db = client[str(database_local['db_Users_name'])] #client["Hypnose_manager"]
+                collection = db[str(database_local['db_users_table'])]
+                row_MDB = collection.find_one({"Email": email})
+
+                #client = pymongo.MongoClient("mongodb://localhost:27017/")
+                #db = client["Hypnose_manager"]
+                #collection = db["Manage_Users"]
                 
                 # On recherche l'adresse dans la base
                 row_MDB = collection.find_one({"Email": email})
@@ -243,9 +250,9 @@ class Login ():
             
             try: 
                 # Se connecter à la base de données MongoDB
-                client = pymongo.MongoClient("mongodb://localhost:27017/")
-                db = client["Hypnose_manager"]
-                collection = db["Manage_Users"]
+                client =pymongo.MongoClient(self.connnexion_local) #pymongo.MongoClient("mongodb://localhost:27017/")
+                db = client[str(database_local['db_Users_name'])] #client["Hypnose_manager"]
+                collection = db[str(database_local['db_users_table'])]
                 
                 # On recherche l'adresse dans la base
                 row_MDB = collection.find_one({"Email": email})
@@ -269,7 +276,7 @@ class Login ():
         self.root.geometry(f"{window_width}x{window_height}+{x}+{y}")
 
     def load_background_image(self):       
-        background_image_pil = Image.open("./images/gramm1.png")
+        background_image_pil = Image.open(images['background_login']) #
         # Redimensionner l'image pour qu'elle corresponde à la taille de la fenêtre
         resized_image = background_image_pil.resize((1380, 780), Image.LANCZOS)
         self.background_image_tk = ImageTk.PhotoImage(resized_image)
@@ -292,10 +299,16 @@ class Login ():
         else :
             
             try:
-                client = pymongo.MongoClient("mongodb://localhost:27017/")
-                db = client["Hypnose_manager"]
+
+                client =pymongo.MongoClient(self.connnexion_local) #pymongo.MongoClient("mongodb://localhost:27017/")
+                db = client[str(database_local['db_Users_name'])] #client["Hypnose_manager"]
+
+                #client = pymongo.MongoClient("mongodb://localhost:27017/")
+                #db = client["Hypnose_manager"]
+
                 if db is not None:
-                    collection = db["Manage_Users"]
+                    collection = db[str(database_local['db_users_table'])]
+                    #collection = db["Manage_Users"]
                     result = collection.find_one({"Email": username,"Mot de passe": password})
                     
                     if result is not None:
@@ -303,8 +316,7 @@ class Login ():
                         self.root.destroy()
                         user_window = UserF()
                         #app.window.mainloop()
-                        
-                        
+                                               
                     else:
                         messagebox.showerror("Connexion", "“Avez-vous oublié votre nom utilisateur et/ou mot de passe ?”",parent=self.root)
                         self.username_entry.focus_set()

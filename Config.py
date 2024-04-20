@@ -33,9 +33,13 @@ database_cloud={'host_prefix' : 'mongodb+srv://',
   'db_attente_name': 'Hypnose_documents_en_attente'
   }
 
-# Image background 
+# Image et icones 
 images={'icone_application' : "./icones/logo2.ico",
   'icone_login' : "./icones/logo2.ico",
-  'background_createlog' : "./images/logo2.png"
+  'background_createlog' : "./images/logo2.png",
+  'background_login' : "./images/gramm1.png",
+  'background_createlogin':"./images/BG3.jpg"
   }
+
+
 
