@@ -1,16 +1,23 @@
-from pymongo import MongoClient
-from gridfs import GridFS
+import tkinter as tk
+from tkinter import ttk
 
-# Se connecter à MongoDB
-client = MongoClient('mongodb://localhost:27017/')
-db = client['Test_hypnose']
+def toggle_checkbox():
+    if checkbox_var.get() == 1:  # Si la case à cocher est cochée
+        checkbox.selection_clear()
+        #checkbox.       # Décocher la case à cocher
 
-# Créer une instance GridFS
-fs = GridFS(db)
+root = tk.Tk()
+root.title("Exemple de décochage d'une case à cocher")
 
-# Ouvrir et lire le fichier PDF
-with open('F31PME.pdf', 'rb') as pdf_file:
-    # Enregistrer le fichier PDF dans GridFS
-    file_id = fs.put(pdf_file, filename='F31PME.pdf')
+# Création de la variable de contrôle de la case à cocher
+checkbox_var = tk.IntVar()
 
-print("PDF file saved with ID:", file_id)
+# Création de la case à cocher
+checkbox = ttk.Checkbutton(root, text="Coché", variable=checkbox_var)
+checkbox.pack(pady=10)
+
+# Création d'un bouton pour décocher la case à cocher
+toggle_button = tk.Button(root, text="Décocher", command=toggle_checkbox)
+toggle_button.pack(pady=5)
+
+root.mainloop()

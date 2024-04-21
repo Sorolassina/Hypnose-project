@@ -11,6 +11,7 @@ from tkinter import ttk
 from tkinter import *
 from gridfs import GridFS
 import os
+import pdfplumber
 
 class App():
     def __init__(self, master=None):
@@ -199,6 +200,7 @@ class App():
 
         # Fermer la connexion à la base de données
         client.close()
+        
         # Effacer le contenu du Treeview
         self.tree.delete(*self.tree.get_children())
         self.titrebar_label.config(text="")
@@ -210,7 +212,7 @@ class App():
 
     def Stockage_Gridfs (self, db, pdf_file_path, doc):
         # Se connecter à MongoDB
-        print (doc)
+        
         fs = GridFS(db)
         filename=pdf_file_path
         # Définir les métadonnées du fichier
@@ -248,58 +250,111 @@ class App():
 
         # Bloquer le focus sur la fenêtre popup
         self.root.grab_set()
-
+        files_issues=[]
         for filename in filenames:
             Titre=filename.split("/")[-1] # On détermine le nom du document
             Type=Titre.split(".")[-1] # On détermine le type de document
 
-            pdf_reader = PyPDF2.PdfReader(filename)
+            #pdf_reader = PyPDF2.PdfReader(filename)
+            pdf_reader = pdfplumber.open(filename)
+            #pdf_reader = fitz.open(filename)
 
             total_files = len(filenames)
             # On extrait le contenu du document
             text = ""
-            Nbrepages=0
-
-            for page_num in range(len(pdf_reader.pages)):
-                page = pdf_reader.pages[page_num]
+            #Nbrepages=0
+            infos_doc = self.extract_metadata(filename)
+            for page_num in  range(len(pdf_reader.pages)):
                 
-                try: # On va déterminer ensuite la langue du documents
+                page = pdf_reader.pages[page_num]
+                #page = pdf_reader.load_page(page_num)
+                
+                try: 
                     text += page.extract_text()
-                    Nbrepages+=1
+                    #text += page.extract_text()
+                    #Nbrepages+=1
                 except Exception as e:
-                    messagebox.showwarning("Extraction",f"Error extracting text from page {page_num + 1}: {e}")
+                    files_issues.append(Titre)                   
+                    messagebox.showwarning("Error",f"Erreur d'extraction de la page {page_num + 1}. L'erreur suivante empêche l'extraction : {e}")
+                    break   
 
             try:
-                language = detect(text)
+                language = detect(text) # On va déterminer ensuite la langue du documents               
             except Exception as e:
-                language = "Langue non détectée"
-                messagebox.showwarning("Extraction",f"Error detecting language: {e}")
-
-            infos_doc = self.extract_metadata(filename) #simpledialog.askstring(Titre, "Quel est l'auteur de ce livre ? :",parent=self.root)
+                language = "inconnue"
+                    #messagebox.showwarning("Extraction",f"Error detecting language: {e}")
+                   
+            self.tree.insert('', 'end', text=filename, values=(datetime.date.today(), Titre, infos_doc['Author'], infos_doc['Nombrepage'], infos_doc['Format'], language,text))
+            
+             #simpledialog.askstring(Titre, "Quel est l'auteur de ce livre ? :",parent=self.root)
             #Title = self.extract_metadata(filename)
-            self.tree.insert('', 'end', text=filename, values=(datetime.date.today(), infos_doc['Title'], infos_doc['Author'], Nbrepages, Type, language,text))
-
+           
             # Mettre à jour la barre de progression et le label
             processed_files += 1
             self.progress_bar['value'] = (processed_files / total_files) * 100
-            self.titrebar_label.config(text=f"Traitement du fichier : {infos_doc['Title']} de {infos_doc['Author']}")
+            self.titrebar_label.config(text=f"Traitement du fichier : {Titre} de {infos_doc['Author']}")
             self.progress_bar.update()
-                   
+                  
         # Réinitialiser la barre de progression et le label une fois tous les fichiers traités
         self.progress_bar['value'] = 0
         self.titrebar_label.config(text="")
 
+        if len(files_issues)!=0:
+            messagebox.showwarning("Fichiers non traités",f"les documents suivants n'ont pas été traités : {files_issues}")
+    
     def extract_metadata(self,file):
         metadata = {}
         pdf_document = fitz.open(file)
-        
-        metadata['Title'] = pdf_document.metadata.get('title', '')
-        metadata['Author'] = pdf_document.metadata.get('author', '')
-        metadata['Subject'] = pdf_document.metadata.get('subject', '')
-        metadata['Producer'] = pdf_document.metadata.get('producer', '')
-        metadata['CreationDate'] = pdf_document.metadata.get('creationDate', '')
-        metadata['ModificationDate'] = pdf_document.metadata.get('modDate', '')
 
+        if pdf_document.metadata.get('title', '')=='':
+           metadata['Title']="inconnue"
+        else :
+            metadata['Title'] = pdf_document.metadata.get('title', '')
+        
+        if pdf_document.metadata.get('author', '')=='':
+          metadata['Author']="inconnue"
+        else :
+            metadata['Author'] = pdf_document.metadata.get('author', '')
+
+        if pdf_document.metadata.get('subject', '')=='':
+          metadata['Subject']="inconnue"
+        else :
+          metadata['Subject'] = pdf_document.metadata.get('subject', '')
+        
+        if pdf_document.metadata.get('producer', '')=='':
+          metadata['Producer']="inconnue"
+        else :
+          metadata['Producer'] = pdf_document.metadata.get('producer', '')
+
+        if pdf_document.metadata.get('creationDate', '')=='':
+          metadata['CreationDate'] ="inconnue"
+        else :
+          metadata['CreationDate'] = pdf_document.metadata.get('creationDate', '')
+
+        if pdf_document.metadata.get('modDate', '')=='':
+          metadata['ModificationDate'] ="inconnue"
+        else :
+          metadata['ModificationDate'] = pdf_document.metadata.get('modDate', '')
+
+        if pdf_document.metadata.get('format', '')=='':
+          metadata['Format'] ="inconnue"
+        else :
+          metadata['Format'] = pdf_document.metadata.get('format', '')
+
+        if pdf_document.page_count==0:
+          metadata['Nombrepage'] ="inconnue"
+        else :
+          metadata['Nombrepage'] = pdf_document.page_count
+
+        if pdf_document.language==None:
+          metadata['Langue'] ="inconnue"
+        else :
+          metadata['Langue'] = pdf_document.language
+
+        
+        metadata['Crypte']=pdf_document.metadata.get('encryption', '')
+
+        
         pdf_document.close()
 
         return metadata

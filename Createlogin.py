@@ -8,6 +8,7 @@ import pymongo
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import smtplib
+import re
 from Config import *
 class CreateLog ():
     def __init__(self, master=None,user_info=None):
@@ -48,98 +49,146 @@ class CreateLog ():
         username_label = Label(self.zone1, text="Nom",bg="#8c1959", font=myFontLabel,fg="white")
         username_label.place(x=15, y=50)
         self.username_entry = Entry(self.zone1, width=30)
-        self.username_entry.insert(0,self.user_info.get("Nom", ""))
+        if self.user_info!=None:
+            self.username_entry.insert(0,self.user_info.get("Nom", ""))
+        
         self.username_entry.place(x=100, y=50)
-        # Liaison de la fonction à l'événement de perte de focus
+        # Liaison de la fonction à l'événement de touche clavier
         self.username_entry.bind("<KeyRelease>", lambda event: self.on_text_change(event, self.username_entry))
-
-        # Email
-        email_label = Label(self.zone1, text="Email", font=myFontLabel,bg="#8c1959", fg="white").place(x=15, y=80)
-        self.email_entry = Entry(self.zone1, width=30)
-        self.email_entry.insert(0,self.user_info.get("Email", ""))
-        self.email_entry.place(x=100, y=80)
-        self.email_entry.bind("<KeyRelease>", lambda event: self.on_text_change(event, self.email_entry))
 
         #Prenoms
         lastname_label = Label(self.zone1, text="Prénoms", font=myFontLabel,bg="#8c1959", fg="white").place(x=300, y=50)
         self.lastname_entry = Entry(self.zone1, width=40)
-        self.lastname_entry.insert(0,self.user_info.get("Prénoms", ""))
+        if self.user_info!=None:
+            self.lastname_entry.insert(0,self.user_info.get("Prénoms", ""))
         self.lastname_entry.place(x=400, y=50)
         self.lastname_entry.bind("<KeyRelease>", lambda event: self.on_text_change(event, self.lastname_entry))
+
+        # Email
+        email_label = Label(self.zone1, text="Email", font=myFontLabel,bg="#8c1959", fg="white").place(x=15, y=80)
+        self.email_entry = Entry(self.zone1, width=30)
+        if self.user_info!=None:
+            self.email_entry.insert(0,self.user_info.get("Email", ""))
+
+        self.email_entry.place(x=100, y=80)
+        self.email_entry.bind("<KeyRelease>", lambda event: self.on_email_change(event, self.email_entry))
+        self.email_entry.bind("<FocusOut>", lambda event: self.validate_mail(event, self.email_entry))
 
         #Question
         question_label = Label(self.zone1, text="Questions", font=myFontLabel,bg="#8c1959", fg="white").place(x=300, y=80)
         value=["Quel est le nom de votre chat ?","Quel est votre groupe sanguin ?"]
         self.question_entry=ttk.Combobox(self.zone1,width=40,state="readonly",values=value)
-        selected_index = value.index(self.user_info.get("Question", ""))
         self.question_entry.place(x=400, y=80)
-        self.question_entry.current(selected_index)
-
+        if self.user_info!=None:
+            selected_index = value.index(self.user_info.get("Question", ""))
+            self.question_entry.current(selected_index)
+        
         # Reponse
         reponse_label = Label(self.zone1, text="Réponse", font=myFontLabel,bg="#8c1959", fg="white").place(x=300, y=110)
         self.reponse_entry = Entry(self.zone1, width=40)
-        self.reponse_entry.insert(0,self.user_info.get("Reponse", ""))
+        if self.user_info!=None:
+            self.reponse_entry.insert(0,self.user_info.get("Reponse", ""))
         self.reponse_entry.place(x=400, y=110)
 
         # Motdepasse
         password_label = Label(self.zone1, text="Mot de passe", font=myFontLabel,bg="#8c1959", fg="white").place(x=15, y=110)   
         self.password_entry = Entry(self.zone1, width=30)
-        self.password_entry.insert(0,self.user_info.get("Mot de passe", ""))
+        if self.user_info!=None:
+            self.password_entry.insert(0,self.user_info.get("Mot de passe", ""))
         self.password_entry.place(x=100, y=110)
-        # Limiter la longueur de l'entrée à 10 caractères       
+
+        # Limiter la longueur de l'entrée à 10 caractères avec les caractères spéciaux une fois le focus perdu      
         self.password_entry.bind("<FocusOut>", lambda event: self.validate_password(event, self.password_entry))
         
         # ConfirmMotdepasse
         Cfpassword_label = Label(self.zone1, text="Confirme MDP", font=myFontLabel,bg="#8c1959", fg="white").place(x=15, y=140)
         self.Cfpassword_entry = Entry(self.zone1, width=30)
         self.Cfpassword_entry.place(x=100, y=140)
-        self.Cfpassword_entry.bind("<FocusOut>", lambda event: self.validate_password(event, self.Cfpassword_entry))
+        #self.Cfpassword_entry.bind("<FocusOut>", lambda event: self.validate_password(event, self.Cfpassword_entry))
 
         # Précaution
         prec_label = Label(self.zone1,bg="#8c1959", 
                            text="*Votre mot de passe doit contenir au moins 10 caractères. \nDes caractères spéciaux, majuscules, minuscules et chiffres.",
                              font=myFontLabel, fg="white").place(x=300, y=140)
         
-        # Boutons de création et abandon
-        if self.user_info.get("Role","")=="Admin":
-           Etat_button="normal"
-        else:
-           Etat_button="disabled"
+        # Boutons de création 
+        #if self.user_info.get("Role","")=="Admin":
+           #Etat_button="normal"
+        #else:
+           #Etat_button="disabled"
 
-        cancel_button = Button(self.zone1, width=10,bg="#39111C",fg="white",text="Cancel",font=myFontBouton, command=self.Cancellogin,cursor="hand2").place(x=555, y=200)
-        update_button = Button(self.zone1, width=10,bg="#39111C",fg="white",text="Update",font=myFontBouton, command=self.UpdateUser,cursor="hand2").place(x=455, y=200)
-        create_button = Button(self.zone1, width=10,bg="#39111C",fg="white",text="Create",font=myFontBouton, command=self.CreateUser,cursor="hand2",state=Etat_button).place(x=355, y=200)
-    
+        cancel_button = Button(self.zone1, width=10,bg="#39111C",fg="white",text="Cancel",font=myFontBouton, command=self.Cancellogin,cursor="hand2").place(x=555, y=200)     
+        update_button = Button(self.zone1, width=10,bg="#39111C",fg="white",text="Update",font=myFontBouton, command=self.UpdateUser,cursor="hand2")
+        update_button.place(x=455, y=200)
+        create_button = Button(self.zone1, width=10,bg="#39111C",fg="white",text="Create",font=myFontBouton, command=self.CreateUser,cursor="hand2")
+        create_button.place(x=355, y=200)
         self.connnexion_local=str(database_local['host'])+str(database_local['port'])+'/'
+        self.username_entry.focus_set()
+
+        if self.user_info!=None:
+            update_button.config(stat="normal")
+            create_button.config(stat="disabled")
+        else :
+            update_button.config(stat="disabled")
+            create_button.config(stat="normal")
 
     def on_text_change(self,event,textbox):
         # Récupérer le texte saisi dans le Entry
         input_text = textbox.get()    
         # Convertir en nom propre
-        formatted_text = input_text.capitalize()   
+        formatted_text = input_text.title()   
         # Effacer le contenu actuel du Entry
         textbox.delete(0, END)
         # Insérer le texte formaté dans le Entry
         textbox.insert(0, formatted_text)
+
+    def on_email_change(self,event,textbox):
+        # Récupérer le texte saisi dans le Entry
+        input_text = textbox.get()
+        if input_text!=None :    
+            # Convertir en nom propre
+            formatted_text = input_text.lower()   
+            # Effacer le contenu actuel du Entry
+            textbox.delete(0, END)
+            # Insérer le texte formaté dans le Entry
+            textbox.insert(0, formatted_text)
+
+    def validate_mail(self, event,textbox):
+        new_text = event.widget.get()       
         
+        # Vérification de la présence de caractères spéciaux, de majuscules, de minuscules et de chiffres
+        #has_special = any(char for char in new_text if char in "@.")
+        if new_text!=None :
+            if "@" in new_text and "." in new_text:
+                return True
+            else:
+                # Sinon, afficher un message d'erreur ou prendre toute autre action nécessaire
+                messagebox.showerror("Erreur", "votre email doit contenir au moins @ et (.).",parent=self.root)
+                #textbox.delete(0,END)
+                textbox.focus_set()
+                # Pour empêcher le focus de quitter le champ tant que la validation n'est pas réussie
+                return False
+            
     def validate_password(self, event,textbox):
         new_text = event.widget.get()
-             
-        # Vérification de la présence de caractères spéciaux, de majuscules, de minuscules et de chiffres
-        has_special = any(char for char in new_text if char in "!@#$%^&*()-_=+[{]}|;:',<.>/?")
-        has_upper = any(char for char in new_text if char.isupper())
-        has_lower = any(char for char in new_text if char.islower())
-        has_digit = any(char for char in new_text if char.isdigit())
-        
-        if has_special and has_upper and has_lower and has_digit and len(new_text) >= 10:
-            # Si tous les critères de validation sont satisfaits, la validation réussit
-            return True
-        else:
-            # Sinon, afficher un message d'erreur ou prendre toute autre action nécessaire
-            messagebox.showerror("Erreur", "Le mot de passe doit être au moins de 10 caractères et contenir au moins 1 caractère spécial, 1 majuscule, 1 minuscule et 1 chiffre.",parent=self.root)
-            textbox.delete(0,END)
-            # Pour empêcher le focus de quitter le champ tant que la validation n'est pas réussie
-            return False
+
+        if new_text!=None :       
+            # Vérification de la présence de caractères spéciaux, de majuscules, de minuscules et de chiffres
+            has_special = any(char for char in new_text if char in "!@#$%^&*()-_=+[{]}|;:',<.>/?~")
+            has_upper = any(char for char in new_text if char.isupper())
+            has_lower = any(char for char in new_text if char.islower())
+            has_digit = any(char for char in new_text if char.isdigit())
+            
+            if has_special and has_upper and has_lower and has_digit and len(new_text) >= 10:
+                # Si tous les critères de validation sont satisfaits, la validation réussit
+                return True
+            else:
+                # Sinon, afficher un message d'erreur ou prendre toute autre action nécessaire
+                messagebox.showerror("Erreur", "Le mot de passe doit être au moins de 10 caractères et contenir au moins 1 caractère spécial, 1 majuscule, 1 minuscule et 1 chiffre.",parent=self.root)
+                #textbox.delete(0,END)
+                textbox.focus_set()
+                # Pour empêcher le focus de quitter le champ tant que la validation n'est pas réussie
+                return False
         
     def UpdateUser(self):
         
@@ -200,16 +249,15 @@ class CreateLog ():
 
                         receiver_email = self.email_entry.get()
                         subject = 'Votre compte Hypnose a été mis à jour'
-                        message = f"Bonjour {self.username_entry.get()} {self.lastname_entry.get()},\n\nVos informations à été modifiées avec succès. \
+                        message = f"Bonjour {self.username_entry.get()} {self.lastname_entry.get()},\n\nVos informations ont été modifiées avec succès. \
                                         \nSi vous êtes l'auteur de cette modification, considérez ce message à titre d'information uniquement.\
-                                        \n\nNouveau mot de passe : {self.password_entry.get()}. \
                                         \n\nSi vous n'êtes pas certain que vous ou votre administrateur êtes l'auteur de cette modification, contactez votre administrateur immédiatement. \
                                         \n\nCordialement, \n\nL'équipe d'Hypnose."
                         
                         
                         
                         self.send_email(sender_email, sender_password, receiver_email, subject, message)
-                        messagebox.showinfo("Modification", f"Un email a été envoyé à {receiver_email} suite à la modification de vos informations.",parent=self.root)
+                        messagebox.showinfo("Modification", f"Un email a été envoyé à votre adresse : {receiver_email}, suite à la modification de vos informations.",parent=self.root)
                         self.ReinitBox() # On réinitialise les textboxes  
                     else:
                         messagebox.showinfo("Modification", "Désolé mais nous ne parvenons pas à trouver cet utilisateur dans notre base.",parent=self.root) 
@@ -240,57 +288,56 @@ class CreateLog ():
                     db = client[str(database_local['db_Users_name'])]
                     collection = db[str(database_local['db_users_table'])]
                     
-                    row_MDB = collection.find_one({"_id": self.user_info.get("Email", "")}) # On recherche d'abord l'email saisi
+                    #row_MDB = collection.find_one({"_id": self.user_info.get("Email", "")}) # On recherche d'abord l'email saisi
                     
-                    if row_MDB == None : # Si l'email saisi n'existe pas
+                    #if row_MDB == None : # Si l'email saisi n'existe pas
                         
-                        #role1=self.user_info['Role']
-                        if self.user_info['Role']=="Admin":
-                            role="Admin"
-                        else:
-                            role="Autre"
+                    #role1=self.user_info['Role']
+                    #if self.user_info['Role']=="Admin":
+                        #role="Admin"
+                    #else:
+                    
 
-                        # On rassemble l'ensemble des infos à insérer dans une liste
-                        operation_mise_a_jour = {"Nom": self.username_entry.get(),
-                                                "Prénoms": self.lastname_entry.get(),
-                                                "Email": self.email_entry.get(),
-                                                "Question": self.question_entry.get(),
-                                                "Reponse": self.reponse_entry.get(),
-                                                "Mot de passe": self.password_entry.get(), 
-                                                "Role": role 
-                                                        }
+                    # On rassemble l'ensemble des infos à insérer dans une liste
+                    operation_mise_a_jour = {"Nom": self.username_entry.get(),
+                                            "Prénoms": self.lastname_entry.get(),
+                                            "Email": self.email_entry.get(),
+                                            "Question": self.question_entry.get(),
+                                            "Reponse": self.reponse_entry.get(),
+                                            "Mot de passe": self.password_entry.get(), 
+                                            "Role": "Autre" 
+                                                    }
 
-                        # Insertion de la nouvelle donnée dans la collection et on stocke le résultat dans une variable
-                        resultat = collection.insert_one(operation_mise_a_jour)
+                    # Insertion de la nouvelle donnée dans la collection et on stocke le résultat dans une variable
+                    resultat = collection.insert_one(operation_mise_a_jour)
 
-                        # Vérification du succès de l'opération en contrôlant cette variable
-                        if resultat.inserted_id:
-                            messagebox.showinfo("Création", f"Bienvenue {operation_mise_a_jour['Nom'] + operation_mise_a_jour['Prénoms']}, dans monde d'hypnose.",parent=self.root)                    
-                            # Définir les détails de l'e-mail
-                            #sender_email = 'sorolassina58@gmail.com'
-                            #sender_password ="mxcu kxhv jwym staa"
+                    # Vérification du succès de l'opération en contrôlant cette variable
+                    if resultat.inserted_id:
+                        messagebox.showinfo("Création", f"Bienvenue {operation_mise_a_jour['Nom']} {operation_mise_a_jour['Prénoms']}, dans monde d'hypnose.",parent=self.root)                    
+                        # Définir les détails de l'e-mail
+                        #sender_email = 'sorolassina58@gmail.com'
+                        #sender_password ="mxcu kxhv jwym staa"
 
-                            # Configurer le serveur SMTP pour Gmail
-                            sender_email = para_smtp['sender_email']
-                            sender_password = para_smtp['sender_password']  # Port SMTP pour Gmail
+                        # Configurer le serveur SMTP pour Gmail
+                        sender_email = para_smtp['sender_email']
+                        sender_password = para_smtp['sender_password']  # Port SMTP pour Gmail
 
-                            receiver_email = self.email_entry.get()
-                            subject = 'Votre compte Hypnose a été créé.'
-                            message = f"Bonjour {self.username_entry.get()} {self.lastname_entry.get()},\n\nVotre compte vient d'être créé avec succès. \
-                                    Si vous êtes l'auteur de cette création, considérez ce message à titre d'information uniquement.\
-                                    \n\nNouveau mot de passe : {self.password_entry.get()}. \
-                                    \n\nSi vous n'êtes pas certain que vous ou votre administrateur êtes l'auteur de cette création, contactez votre administrateur immédiatement. \
-                                    \n\nCordialement, \n\nL'équipe d'Hypnose."
-                            self.send_email(sender_email, sender_password, receiver_email, subject, message)
-                            messagebox.showinfo("Création", f"Un email a été envoyé à {receiver_email} avec votre clé magique créée.",parent=self.root)
-                            self.ReinitBox() # On réinitialise les textboxes                       
-                        else:
-                            messagebox.showinfo("Création", "Oups! Désolé nous n'arrivons pas à vous créer dans la base de données.",parent=self.root)
-
-                        client.close() # On ferme la connexion au serveur par prudence    
-                        self.root.destroy() # On ferme le formulaire de création
+                        receiver_email = self.email_entry.get()
+                        subject = 'Votre compte Hypnose a été créé.'
+                        message = f"Bonjour {self.username_entry.get()} {self.lastname_entry.get()},\n\nVotre compte vient d'être créé avec succès. \
+                                 \nSi vous êtes l'auteur de cette création, considérez ce message à titre d'information uniquement.\
+                                \n\nSi vous n'êtes pas certain que vous ou votre administrateur êtes l'auteur de cette création, contactez votre administrateur immédiatement. \
+                                \n\nCordialement, \n\nL'équipe d'Hypnose."
+                        self.send_email(sender_email, sender_password, receiver_email, subject, message)
+                        messagebox.showinfo("Création", f"Un email a été envoyé à {receiver_email}.",parent=self.root)
+                        self.ReinitBox() # On réinitialise les textboxes                       
                     else:
-                        messagebox.showinfo("Création", "Oups! ce nom d'utilisateur existe déjà, Veuillez en choisir un autre.",parent=self.root)
+                        messagebox.showinfo("Création", "Oups! Désolé nous n'arrivons pas à vous insérer dans la base de données.",parent=self.root)
+
+                    client.close() # On ferme la connexion au serveur par prudence    
+                    self.root.destroy() # On ferme le formulaire de création
+                #else:
+                    #messagebox.showinfo("Création", "Oups! ce nom d'utilisateur existe déjà, Veuillez en choisir un autre.",parent=self.root)
 
                     #client.close() # On ferme la connexion au serveur par prudence
                     #self.root.destroy() # On ferme le formulaire de création                       
@@ -328,6 +375,7 @@ class CreateLog ():
         #smtp_server = 'smtp.gmail.com'
         #smtp_port = 587  # Port SMTP pour Gmail
         
+        
         # Configurer le serveur SMTP pour Gmail
         smtp_server = para_smtp['smtp_server']
         smtp_port = para_smtp['smtp_port']  # Port SMTP pour Gmail
@@ -340,13 +388,18 @@ class CreateLog ():
 
         # Ajouter le corps du message
         msg.attach(MIMEText(message, 'plain'))
-        # Établir une connexion avec le serveur SMTP
-        server = smtplib.SMTP(smtp_server, smtp_port)
-        server.starttls()  # Activer le mode TLS (Transport Layer Security)
-        # Authentification avec le compte Gmail
-        server.login(sender_email, sender_password)
-        # Envoyer l'e-mail
-        server.sendmail(sender_email, receiver_email, msg.as_string())
+
+        try :
+            # Établir une connexion avec le serveur SMTP
+            server = smtplib.SMTP(smtp_server, smtp_port)
+            server.starttls()  # Activer le mode TLS (Transport Layer Security)
+            # Authentification avec le compte Gmail
+            server.login(sender_email, sender_password)
+            # Envoyer l'e-mail
+            server.sendmail(sender_email, receiver_email, msg.as_string())
+        except Exception as ex:
+            messagebox.showerror("Internet",f"Oups! problème de connexion. Vérifier votre connexion internet et réessayez : {str(ex)}",parent=self.root)       
+ 
         # Fermer la connexion avec le serveur SMTP
         server.quit()
 

@@ -185,15 +185,20 @@ class Login ():
 
         # Ajouter le corps du message
         msg.attach(MIMEText(message, 'plain'))
-        # Établir une connexion avec le serveur SMTP
-        server = smtplib.SMTP(smtp_server, smtp_port)
-        server.starttls()  # Activer le mode TLS (Transport Layer Security)
-        # Authentification avec le compte Gmail
-        server.login(sender_email, sender_password)
-        # Envoyer l'e-mail
-        server.sendmail(sender_email, receiver_email, msg.as_string())
-        # Fermer la connexion avec le serveur SMTP
-        server.quit()
+
+        try :
+            # Établir une connexion avec le serveur SMTP
+            server = smtplib.SMTP(smtp_server, smtp_port)
+            server.starttls()  # Activer le mode TLS (Transport Layer Security)
+            # Authentification avec le compte Gmail
+            server.login(sender_email, sender_password)
+            # Envoyer l'e-mail
+            server.sendmail(sender_email, receiver_email, msg.as_string())
+            # Fermer la connexion avec le serveur SMTP
+            server.quit()
+        except Exception as ex:
+            messagebox.showerror("Internet",f"Oups! problème de connexion. Vérifier votre connexion internet et réessayez : {str(ex)}",parent=self.root)       
+  
 
     def Delete_user(self):
                         
@@ -244,7 +249,7 @@ class Login ():
         
     def CreateUser(self):
         
-        email = simpledialog.askstring("Suppression", "Veuillez saisir votre nom utilisateur:",parent=self.root)
+        email = simpledialog.askstring("Création", "Veuillez saisir votre nom utilisateur:",parent=self.root)
 
         if email is not None:
             
@@ -260,8 +265,8 @@ class Login ():
                 if row_MDB != None : # Si l'email saisi existe
                     cle = simpledialog.askstring("Création utilisateur", "Veuillez saisir votre mot de passe:",parent=self.root)
                     if cle==row_MDB["Mot de passe"] and row_MDB["Role"]=="Admin": # Si la clé est conforme à celle de l'administratrice et le mot de passe également
-                        user_info =row_MDB   # Remplacez ceci par les informations de l'utilisateur                      
-                        app = CreateLog(self.root,user_info) 
+                        #user_info =row_MDB   # Remplacez ceci par les informations de l'utilisateur                      
+                        app = CreateLog(self.root) 
                     else :
                         messagebox.showinfo("Création", "Seulement l'Administratrice peut créer un utilisateur.",parent=self.root)
             

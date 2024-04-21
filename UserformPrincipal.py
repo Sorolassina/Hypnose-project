@@ -17,7 +17,7 @@ import tempfile
 import subprocess
 import platform
 from bson import ObjectId
-
+import time
 
 class UserF():
     def __init__(self):
@@ -77,7 +77,7 @@ class UserF():
         self.tree.pack(expand=True,fill='both')
 
         # Configuration des événement liés à ma treeview
-        #self.tree.bind("<ButtonRelease-1>", self.on_treeview_select)
+        self.tree.bind("<ButtonRelease-1>", self.on_treeview_select)
         self.tree.bind("<Double-1>", self.display_pdf)
         self.tree.bind("<Enter>", lambda event: self.tree.config(cursor="hand2"))
         self.tree.bind("<Leave>", lambda event: self.tree.config(cursor=""))
@@ -199,14 +199,18 @@ class UserF():
         delete_button = Button(Cadre_bouton, width=20,text="Supprimer",font=myFontBouton, command=self.remove_file,cursor="hand2")
         delete_button.place(x=8, y=270)
         self.lookvalue_entry = ttk.Entry(zone1, background='#FFFFFF')
-        self.lookvalue_entry.place(x=310, y=20,width=500,height=28) 
+        self.lookvalue_entry.place(x=460, y=20,width=350,height=28) 
         self.lookvalue_entry.bind("<KeyRelease>", self.filter_tree)
 
-        look_button = Button(zone1, width=15,text="Rechercher",foreground="black",font=myFontBouton, command="",cursor="hand2")      
+        self.labelCount=Label(zone1,text='',font=myFontLabel)
+        self.labelCount.place(x=150, y=20)
+
+
+        look_button = Button(zone1, width=15,text="Défiltrer",foreground="black",font=myFontBouton, command=self.deselect,cursor="hand2")      
         look_button.place(x=825, y=20)
 
         look_label = Label(zone1, width=15,text="Rechercher ici :",foreground="black",font=myFontLabel)      
-        look_label.place(x=150, y=20)    
+        look_label.place(x=300, y=20)    
 
         #Choix pour changement de Storage et de Base
         self.changestorage_var = tk.IntVar(value=0)
@@ -216,6 +220,15 @@ class UserF():
         self.changebase_var = tk.IntVar(value=0)
         self.checkbox_ChangeCollection = ttk.Checkbutton(Cadre_bouton, text="Changer de Base ?", cursor="hand2",variable=self.changebase_var,style="White.TCheckbutton",state="disabled",command=self.changercollection)
         self.checkbox_ChangeCollection.place(x=8, y=230)
+
+        # Créer une barre de progression avec une hauteur plus petite
+        style = ttk.Style()
+        style.configure("Custom.TProgressbar", thickness=10,foreground='green', background='green')  # Épaisseur de la barre de progression
+        style.layout("Custom.TProgressbar", [('Custom.Progressbar.trough', {'sticky': 'nswe', 'children': [('Custom.Progressbar.pbar', {'side': 'left', 'sticky': 'ns'})]})])
+
+        self.progress_bar = ttk.Progressbar(zone1, orient='horizontal', length=1010, mode='determinate',style="Custom.TProgressbar")
+        self.progress_bar.place(x=100,y=710)
+        
 
          #Création de nos variables
         self.EltAChanger={'Id':"",'Storage':"",'Base':""}
@@ -230,6 +243,11 @@ class UserF():
 
         self.window.mainloop()
 
+    def deselect(self):
+        self.tree.selection_remove(self.tree.selection())
+        self.lookvalue_entry.delete(0,END)
+        self.tree.update_idletasks()
+     
     def changerbase(self):
         
         if self.changestorage_var.get() == 1 and self.EltAChanger['Id']!=None:
@@ -245,7 +263,8 @@ class UserF():
         elif self.changestorage_var.get() == 0 and self.EltAChanger['Id']!=None:
             self.EltAChanger['Storage']=self.Ancien_storage
 
-        if self.changestorage_var.get() == 0 and self.changebase_var.get() == 0:  
+        if self.changestorage_var.get() == 0 and self.changebase_var.get() == 0: 
+            
             self.update_button.config(state="disabled")
 
     def changercollection(self):
@@ -262,7 +281,8 @@ class UserF():
         elif self.changebase_var.get() == 0 and self.EltAChanger['Id']!=None:
             self.EltAChanger['Base']=self.Ancienne_bases
 
-        if self.changestorage_var.get() == 0 and self.changebase_var.get() == 0:  
+        if self.changestorage_var.get() == 0 and self.changebase_var.get() == 0:
+            
             self.update_button.config(state="disabled")   
 
     def CheckBoxDB_manage(self):
@@ -297,18 +317,40 @@ class UserF():
            
             self.Appel_loading_data()
 
+    def count_elt(self):
+           # Compter le nombre d'éléments dans la TreeView
+           num_elements = len(self.tree.get_children())
+           # Mettre à jour l'étiquette avec le nombre d'éléments
+           self.labelCount.config(text=f"{num_elements} documents listés /")
+   
     def Appel_loading_data(self) :
         if self.basecloud_var.get() == 1 and self.docvalide_var.get() == 1:
            self.loading_data()
+           self.count_elt()
+           self.checkbox_ChangeCollection.config(text="Mettre en attente")
+           self.checkbox_ChangeDB.config(text="Transférer en local")
+
         elif self.baselocale_var.get() == 1 and self.docvalide_var.get() == 1:
            self.loading_data()
+           self.count_elt()
+           self.checkbox_ChangeCollection.config(text="Mettre en attente")
+           self.checkbox_ChangeDB.config(text="Transférer sur le cloud")
+
         elif self.baselocale_var.get() == 1 and self.docattente_var.get() == 1:
            self.loading_data()
+           self.count_elt()
+           self.checkbox_ChangeCollection.config(text="Valider le(s) documents")
+           self.checkbox_ChangeDB.config(text="Transférer sur le cloud")
+
         elif self.basecloud_var.get() == 1 and self.docattente_var.get() == 1:
            self.loading_data()
+           self.count_elt()
+           self.checkbox_ChangeCollection.config(text="Valider le(s) documents")
+           self.checkbox_ChangeDB.config(text="Transférer vers le local")
         else:
             # Exemple d'utilisation pour vider le Treeview
             self.clear_treeview()
+            self.count_elt()
             
     def loading_file(self):
         app = App(self.window) 
@@ -474,7 +516,8 @@ class UserF():
                  
         except Exception as e:
             messagebox.showerror("Connexion", f"Erreur lors du chargement des données : {e}",parent=self.window)
-              
+
+
     def transfer_selected_documents(self):
 
         try:
@@ -600,9 +643,8 @@ class UserF():
                             elif self.EltAChanger['Base']=='Hypnose_documents_validés':
                                 source_collect = source_client['Hypnose_documents_validés']
                                 destination_collect = destination_client['Hypnose_documents_validés']
-                # Délection les checkboxes sélectionnés
-                self.checkbox_ChangeDB.state(['!selected'])
-                self.checkbox_ChangeCollection.state(['!selected'])
+                
+                
                 
                 # Récupérer les instances de GridFS               
 
@@ -611,14 +653,15 @@ class UserF():
 
                 selected_item = self.tree.selection()
                 if selected_item:
+                    count_file=0
                     for item in selected_item:
                         # Récupérer l'index de chaque élément
                         # Récupérer les valeurs de chaque élément
-                        values = self.tree.item(item, 'values')
-                        id=values[6]
-                        
+                        #values = self.tree.item(item, 'values')
+                        #id=values[6]
+                        item_id = self.tree.item(item, 'text')
                         # Convertir l'ID en un objet ObjectId
-                        object_id = ObjectId(id)
+                        object_id = ObjectId(item_id)
                         
                         file = source_fs.find_one({'_id': object_id})
                         filename = file.metadata.get('filename', 'N/A')
@@ -634,16 +677,39 @@ class UserF():
                                 destination_fs.put(file.read(), metadata=file.metadata)
                                 # Supprimer le fichier de la Storage de données source
                                 source_fs.delete(object_id)
+                                # Supprimer l'élément du Treeview
+                                self.tree.delete(item)
+                                count_file+=1
+                                # On actualise la barre de progression
+                                self.progress_bar['value'] = (count_file / len(selected_item)) * 100                               
+                                self.progress_bar.update()
+
+                                
+                      
                         else:
                             messagebox.showwarning("Warning", f"File with ID {filename} not found.")
 
                 # Fermer les connexions
+                self.progress_bar.stop()
+                # Délection les checkboxes sélectionnés
+                self.checkbox_ChangeDB.setvar(value=0)
+                self.checkbox_ChangeCollection.setvar(value=0)
+                self.Appel_loading_data()
                 source_client.close()
                 destination_client.close()
-                self.Appel_loading_data()
+                
+
         except Exception as e:
             messagebox.showerror("Connexion", f"Erreur de connexion : {e}",parent=self.window)
-             
+
+    """ def simulate_loading(self,i):
+        self.progress_bar.start()  # Démarre la barre de progression
+        #for i in range(total):
+        time.sleep(0.1)  # Simule une tâche en cours de chargement
+        self.progress_bar['value'] = i  # Met à jour la valeur de la barre de progression
+        self.window.update_idletasks()  # Met à jour l'affichage de la fenêtre
+        self.progress_bar.stop()  # Arrête la barre de progression après la fin de la tâche """
+        
     def ModifyorCreate(self):
         try:
             if self.basecloud_var.get() == 1:
@@ -730,6 +796,14 @@ class UserF():
             self.tree.delete(item)
 
     def remove_file(self):
+        # Connexion à la Storage de données
+        if self.EltAChanger['Storage']=="Cloud" :
+            Client = pymongo.MongoClient("mongodb+srv://sorolassina:2311SLSS@hypnosecluster.5vtl4ex.mongodb.net/")
+            db=Client[self.EltAChanger['Base']]
+        elif self.EltAChanger['Storage']=="Locale":
+            Client = pymongo.MongoClient("mongodb://localhost:27017/")
+            db=Client[self.EltAChanger['Base']]
+       
         # Récupérer l'élément sélectionné dans le Treeview
         selected_items = self.tree.selection()
         if not selected_items:
@@ -737,16 +811,26 @@ class UserF():
             return
         else:
 
-            if messagebox.askyesno("Avertissement", "Voulez-vous supprimer ces fichier des documents de votre base ?") :              
-                # Supprimer chaque élément sélectionné du Treeview
-                for item in selected_items:
+            if messagebox.askyesno("Avertissement", "Voulez-vous supprimer ces fichiers de votre base ?",parent=self.window) :                                            
+                fs = GridFS(db)                        
+
+                for item in selected_items :       
+                    # Récupérer l'ID de l'élément sélectionné
+                    item_id = self.tree.item(item, 'text')
+                    #Transformer l'id en objectID
+                    object_id = ObjectId(item_id)
+                    # Suppression de l'élément dans GridFS
+                    fs.delete(object_id) 
                     # Supprimer l'élément du Treeview
-                    self.tree.delete(item)
+                    self.tree.delete(item) 
+        Client.close()
+
+    
 
 
-#if __name__ == "__main__":
-    #app = UserF()
-    #app.window.mainloop()
+if __name__ == "__main__":
+    app = UserF()
+    app.window.mainloop()
 #if __name__ == "__main__":
     #root = tk.Tk()
     #login_window = Login(root)
