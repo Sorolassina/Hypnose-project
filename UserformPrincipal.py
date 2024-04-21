@@ -454,20 +454,39 @@ class UserF():
         self.background_label.place(x=0,y=0,relwidth=1, relheight=1)
 
     def loading_data(self):
+        count_file=0
+        # On actualise la barre de progression
+        self.progress_bar['value'] = (count_file / 3) * 100                               
+        self.progress_bar.update()
+
         try:
             if self.basecloud_var.get() == 1 :
-                
+                count_file=1
+                # On actualise la barre de progression
+                self.progress_bar['value'] = (count_file / 3) * 100                               
+                self.progress_bar.update()
+
                 # Connexion à la Storage de données
                 self.Client = pymongo.MongoClient("mongodb+srv://sorolassina:2311SLSS@hypnosecluster.5vtl4ex.mongodb.net/")
                
                 self.EltAChanger['Storage']="Cloud" 
 
                 if self.docattente_var.get() == 1 :
+                    count_file=2
+                    # On actualise la barre de progression
+                    self.progress_bar['value'] = (count_file / 3) * 100                               
+                    self.progress_bar.update()
+
                     self.db=self.Client["Hypnose_documents_en_attente"]
                     self.load_files_from_gridfs(self.db)       
                     
 
                 elif self.docvalide_var.get() == 1 :
+                    count_file=2
+                    # On actualise la barre de progression
+                    self.progress_bar['value'] = (count_file / 3) * 100                               
+                    self.progress_bar.update()
+
                     #Base = db["Hypnose_documents_validés"]
                     self.EltAChanger['Base']="Hypnose_documents_validés" #On récupère la Base sélectionnée
                      
@@ -482,12 +501,21 @@ class UserF():
                       
                 
             elif self.baselocale_var.get() == 1 :
+                count_file=1
+                # On actualise la barre de progression
+                self.progress_bar['value'] = (count_file / 3) * 100                               
+                self.progress_bar.update()
+
                 # Connexion à la Storage de données
                 self.Client = pymongo.MongoClient("mongodb://localhost:27017/")
                 self.EltAChanger['Storage']="Locale" #On récupère la Storage sélectionnée
 
                 if self.docattente_var.get() == 1 :
-                    
+                    count_file=2
+                    # On actualise la barre de progression
+                    self.progress_bar['value'] = (count_file / 3) * 100                               
+                    self.progress_bar.update()
+
                     #Base = db["Hypnose_documents_en_attente"]
                     self.EltAChanger['Base']="Hypnose_documents_en_attente" #On récupère la Base sélectionnée
                     # Exemple d'utilisation pour vider le Treeview
@@ -497,6 +525,11 @@ class UserF():
                     self.load_files_from_gridfs(self.db)             
 
                 elif self.docvalide_var.get() == 1 :
+                    count_file=2
+                    # On actualise la barre de progression
+                    self.progress_bar['value'] = (count_file / 3) * 100                               
+                    self.progress_bar.update()
+
                     #Base = self.db["Hypnose_documents_validés"]
                     self.EltAChanger['Base']="Hypnose_documents_validés" #On récupère la Base sélectionnée
                     # Récupération de tous les documents dans la Base
@@ -517,6 +550,8 @@ class UserF():
         except Exception as e:
             messagebox.showerror("Connexion", f"Erreur lors du chargement des données : {e}",parent=self.window)
 
+        # On actualise la barre de progression                              
+        self.progress_bar.stop()
 
     def transfer_selected_documents(self):
 
@@ -692,8 +727,14 @@ class UserF():
                 # Fermer les connexions
                 self.progress_bar.stop()
                 # Délection les checkboxes sélectionnés
-                self.checkbox_ChangeDB.setvar(value=0)
-                self.checkbox_ChangeCollection.setvar(value=0)
+
+                if self.changestorage_var.get() == 1:  # Si la case à cocher est cochée
+                   self.changestorage_var.set(0) 
+                if self.changebase_var.get() == 1:  # Si la case à cocher est cochée
+                   self.changebase_var.set(0) 
+                
+                self.changercollection()
+                self.changerbase()
                 self.Appel_loading_data()
                 source_client.close()
                 destination_client.close()
