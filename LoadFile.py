@@ -6,7 +6,8 @@ import PyPDF2
 import pymongo
 from tkinter import messagebox, simpledialog
 from langdetect import detect
-import fitz  # PyMuPDF
+import fitz  
+
 from tkinter import ttk
 from tkinter import *
 from gridfs import GridFS

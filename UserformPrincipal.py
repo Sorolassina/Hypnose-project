@@ -467,6 +467,7 @@ class UserF():
                 self.progress_bar.update()
 
                 # Connexion à la Storage de données
+                #self.Client.close()
                 self.Client = pymongo.MongoClient("mongodb+srv://sorolassina:2311SLSS@hypnosecluster.5vtl4ex.mongodb.net/")
                
                 self.EltAChanger['Storage']="Cloud" 
@@ -477,10 +478,13 @@ class UserF():
                     self.progress_bar['value'] = (count_file / 3) * 100                               
                     self.progress_bar.update()
 
+                    #try:
                     self.db=self.Client["Hypnose_documents_en_attente"]
+                    #except Exception as e:
+                        #messagebox.showerror("Connexion", f"Erreur lors du chargement des données : {e}",parent=self.window)
+    
                     self.load_files_from_gridfs(self.db)       
                     
-
                 elif self.docvalide_var.get() == 1 :
                     count_file=2
                     # On actualise la barre de progression
@@ -507,6 +511,7 @@ class UserF():
                 self.progress_bar.update()
 
                 # Connexion à la Storage de données
+                #self.Client.close()
                 self.Client = pymongo.MongoClient("mongodb://localhost:27017/")
                 self.EltAChanger['Storage']="Locale" #On récupère la Storage sélectionnée
 
@@ -539,8 +544,7 @@ class UserF():
 
                     self.db=self.Client["Hypnose_documents_validés"]
                     self.load_files_from_gridfs(self.db)
-                    
-                    
+               
                 else:
                     messagebox.showerror("Affichage", "Aucune table n'a été sélectionnée.")
                      
@@ -718,9 +722,7 @@ class UserF():
                                 # On actualise la barre de progression
                                 self.progress_bar['value'] = (count_file / len(selected_item)) * 100                               
                                 self.progress_bar.update()
-
-                                
-                      
+                  
                         else:
                             messagebox.showwarning("Warning", f"File with ID {filename} not found.")
 
@@ -866,12 +868,11 @@ class UserF():
                     self.tree.delete(item) 
         Client.close()
 
-    
-
-
 if __name__ == "__main__":
     app = UserF()
     app.window.mainloop()
+
+
 #if __name__ == "__main__":
     #root = tk.Tk()
     #login_window = Login(root)
