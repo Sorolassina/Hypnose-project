@@ -51,10 +51,10 @@ class UserF():
         Cadre_affichage = ttk.Frame(zone1, borderwidth=2, style='My.TFrame',relief='groove')
         Cadre_affichage.place(x=100,y=55,width=1010,height=655)
          
-         # Création du Treeview avec 3 colonnes
+         # Création du Treeview avec 7 colonnes
         self.tree = ttk.Treeview(Cadre_affichage, columns=("Date",'Titre','Auteur','Pages','Type','Langue','Id'))
         
-        # Définition des en-têtes de colonnes
+        # Définition des en-têtes de colonnes de ma treeview
         self.tree.heading("Date", text="Date")
         self.tree.heading('Titre', text='Titre')
         self.tree.heading('Auteur', text='Auteur')      
@@ -63,7 +63,7 @@ class UserF():
         self.tree.heading("Langue", text="Langue")
         self.tree.heading("Id", text="Id")
         
-        self.tree["show"]="headings"
+        self.tree["show"]="headings" # On affiche les entêtes
 
         # Définition de la largeur des colonnes
         self.tree.column("Date", width=70)
@@ -78,9 +78,9 @@ class UserF():
 
         # Configuration des événement liés à ma treeview
         self.tree.bind("<ButtonRelease-1>", self.on_treeview_select)
-        self.tree.bind("<Double-1>", self.display_pdf)
-        self.tree.bind("<Enter>", lambda event: self.tree.config(cursor="hand2"))
-        self.tree.bind("<Leave>", lambda event: self.tree.config(cursor=""))
+        self.tree.bind("<Double-1>", self.display_pdf) # Afficher le document après un double clic dessus
+        self.tree.bind("<Enter>", lambda event: self.tree.config(cursor="hand2")) # Donner la forme de main au curseur une fois vous êtes sur la treeview
+        self.tree.bind("<Leave>", lambda event: self.tree.config(cursor="")) # Donner la forme normale au curseur une fois vous quittez la treeview
 
         # Création de la barre de défilement verticale
         self.scrollbar_y = tk.Scrollbar(Cadre_affichage, orient="vertical", command=self.tree.yview)
@@ -103,121 +103,84 @@ class UserF():
         self.tree.bind("<<TreeviewSelect>>", self.on_treeview_select)
         self.scrollbar_x.bind("<B1-Motion>", lambda event: self.tree.xview_moveto(event.x))
         self.scrollbar_y.bind("<B1-Motion>", lambda event: self.tree.yview_moveto(event.y))
-        # Lier l'événement clic de la souris pour désélectionner les éléments
-        #self.tree.bind("<Button-1>", self.deselect)
-
-        # Création du cadre pour les box à renseigner
+        
+        # Création du cadre à gauche
         Cadre_box = ttk.Frame(zone1, borderwidth=2, style='My.TFrame',relief='groove')
         Cadre_box.place(x=20,y=20,width=80,height=690)
-                     
-            # Titre 
-        #self.title_label = ttk.Label(Cadre_box, text="Titre", font=myFontLabel,width=20,background="white")
-        #self.title_label.place(x=15, y=15)
-        #self.title_entry = Entry(Cadre_box, background='#FFFFFF')
-        #self.title_entry.place(x=15, y=45,width=200,height=25) 
-
-            # Auteur 
-        #self.aut_label = ttk.Label(Cadre_box, text="Auteur", font=myFontLabel,width=20,background="white")
-        #self.aut_label.place(x=15, y=75)
-        #self.aut_entry = Entry(Cadre_box, background='#FFFFFF')
-        #self.aut_entry.place(x=15, y=105,width=200,height=25) 
-  
-            # Date enregistrement 
-        #self.de_label = ttk.Label(Cadre_box, text="Date", font=myFontLabel,width=20,background="white")
-        #self.de_label.place(x=15, y=135)
-        #self.de_entry = DateEntry(Cadre_box, background='#FFFFFF')
-        #self.de_entry.place(x=15, y=165,width=200,height=25)
-
-            # Nombre de page 
-        #self.page_label = ttk.Label(Cadre_box, text="Pages", font=myFontLabel,width=20,background="white")
-        #self.page_label.place(x=15, y=195)
-        #self.page_entry = Entry(Cadre_box, background='#FFFFFF')
-        #self.page_entry.place(x=15, y=225,width=200,height=25) 
-        
-            # Genre
-        #self.genre_label = ttk.Label(Cadre_box, text="Type", font=myFontLabel,width=20,background="white")
-        #self.genre_label.place(x=15, y=255)
-        #self.type_entry = ttk.Combobox(Cadre_box, background='#FFFFFF',values=("pdf","csv","text","docx"))
-        #self.type_entry.place(x=15, y=285,width=200,height=25) 
-
-         # Langues
-        #self.langue_label = ttk.Label(Cadre_box, text="Langue", font=myFontLabel,width=20,background="white")
-        #self.langue_label.place(x=15, y=315)
-        #self.langue_entry = ttk.Combobox(Cadre_box, background='#FFFFFF',values=("fr","en","de","es","pt"))
-        #self.langue_entry.place(x=15, y=345,width=200,height=25) 
-
+ 
         # Création du cadre pour les boutons
         Cadre_bouton = ttk.Frame(zone1, borderwidth=2, style='My.TFrame',relief="solid")
         Cadre_bouton.place(x=1120,y=20,width=190,height=690)
 
-            # Boutons de CRUD
-        # Créez la case à cocher
-        # Créez un style personnalisé pour la case à cocher
-        #self.styleck = ttk.Style()
-        #self.styleck.configure("White.TCheckbutton", background="white",borderwidth=0,foreground="green")
-
-        self.stylcheckbox = ttk.Style()
+        self.stylcheckbox = ttk.Style() # On va configurer un style de checkbox qu'on appliquera à nos checkbox
         self.stylcheckbox.configure("White.TCheckbutton", background="white",borderwidth=0)
-        # Créez une variable Tkinter pour stocker l'état de la case à cocher
-        #self.etat_checkbox = tk.IntVar()
-        #self.checkbox = ttk.Checkbutton(Cadre_bouton, text="Documents validés",style="White.TCheckbutton", cursor="hand2",variable=self.etat_checkbox, command=self.etat_modifie)
-        #self.checkbox.place(x=8,y=60)
 
+        # Configuration du bouton création
         quit_button = Button(Cadre_bouton, width=20,text="Quitter",bg="red",foreground="white",font=myFontBouton, command=lambda: self.window.destroy(),cursor="hand2").place(x=8, y=20)
 
+        # Creation du checkbox base cloud
         self.basecloud_var = tk.IntVar()
         self.checkbox_basecloud = ttk.Checkbutton(Cadre_bouton, text="Stockage cloud",state="disabled", cursor="hand2",variable=self.basecloud_var,style="White.TCheckbutton", command=self.CheckBoxDB_manage)
         self.checkbox_basecloud.place(x=8,y=60)
 
+        #Creation du checkbox base local
         self.baselocale_var = tk.IntVar(value=1)
         self.checkbox_baseclocale = ttk.Checkbutton(Cadre_bouton, text="Stockage local", cursor="hand2",variable=self.baselocale_var,style="White.TCheckbutton", command=self.CheckBoxDB_manage)
         self.checkbox_baseclocale.place(x=8,y=90)
 
-        self.docattente_var = tk.IntVar(value=1)
+        #On configure le checkbox doc attente
+        self.docattente_var = tk.IntVar(value=1) # Variable censé recueillir l'état de notre chkbox
         self.checkbox_docattente = ttk.Checkbutton(Cadre_bouton, text="Documents en attente", cursor="hand2",variable=self.docattente_var,style="White.TCheckbutton", command=self.CheckBoxCollect_manage)
         self.checkbox_docattente.place(x=8,y=120)
 
-        self.docvalide_var = tk.IntVar()
+        #On configure le checkbox docs validés
+        self.docvalide_var = tk.IntVar() # Variable censé recueillir l'état de notre chkbox
         self.checkbox_docvalide = ttk.Checkbutton(Cadre_bouton, text="Documents certifiés",state="disabled", cursor="hand2",variable=self.docvalide_var,style="White.TCheckbutton", command=self.CheckBoxCollect_manage)
         self.checkbox_docvalide.place(x=8,y=150)
-       
-        # On va lancer nos deux fonctions de vérification de checkbox
-        #self.CheckBoxDB_manage()
-        #self.CheckBoxCollect_manage()
 
-        self.cloudBD=tk.StringVar()
-        self.localBD=tk.StringVar()
-        self.certifie=tk.StringVar()
-        self.noncertifie=tk.StringVar()
+        # On va créer les variables globales
+        self.cloudBD=tk.StringVar() #Stocker la connexion au cloud
+        self.localBD=tk.StringVar() #Stocker la connexion au local
+        self.certifie=tk.StringVar() #Stocker la connexion aux documents certifiés
+        self.noncertifie=tk.StringVar() #Stocker la connexion aux documents non validés
 
-        self.db=tk.StringVar()
-        #refresh_button = Button(Cadre_bouton, width=20,text="Actualiser",font=myFontBouton, command="",cursor="hand2").place(x=8, y=50)
+        # Creation du button create 
         create_button = Button(zone1, width=15,text="Charger fichiers",font=myFontBouton, command=self.loading_file,cursor="hand2")
-        create_button.place(x=970, y=20)    
+        create_button.place(x=970, y=20) 
+
+        # On crée le button update   
         self.update_button = Button(Cadre_bouton, width=20,text="Transférer",font=myFontBouton, command=self.transfer_selected_documents,state="disabled",cursor="hand2")
         self.update_button.place(x=8, y=180) 
+
+        # On crée le button delete
         delete_button = Button(Cadre_bouton, width=20,text="Supprimer",font=myFontBouton, command=self.remove_file,cursor="hand2")
         delete_button.place(x=8, y=270)
+
+        # On crée la zone de saisie de recherche
         self.lookvalue_entry = ttk.Entry(zone1, background='#FFFFFF')
         self.lookvalue_entry.place(x=460, y=20,width=350,height=28) 
-        self.lookvalue_entry.bind("<KeyRelease>", self.filter_tree)
 
+        self.lookvalue_entry.bind("<KeyRelease>", self.filter_tree) # Evénément à chaque clique sur une touche dans la zone de saisie de recherche
+
+        # Un label pour compter le nombre d'éléments dans la treeview
         self.labelCount=Label(zone1,text='',font=myFontLabel)
         self.labelCount.place(x=150, y=20)
 
+        # Création du bouton recherche
+        Defilter_button = Button(zone1, width=15,text="Défiltrer",foreground="black",font=myFontBouton, command=self.deselect,cursor="hand2")      
+        Defilter_button.place(x=825, y=20)
 
-        look_button = Button(zone1, width=15,text="Défiltrer",foreground="black",font=myFontBouton, command=self.deselect,cursor="hand2")      
-        look_button.place(x=825, y=20)
-
+        # Creation du label
         look_label = Label(zone1, width=15,text="Rechercher ici :",foreground="black",font=myFontLabel)      
         look_label.place(x=300, y=20)    
 
         #Choix pour changement de Storage et de Base
-        self.changestorage_var = tk.IntVar(value=0)
+        self.changestorage_var = tk.IntVar(value=0) # Stocker l'état de la chekboxe changement de DB
         self.checkbox_ChangeDB = ttk.Checkbutton(Cadre_bouton, text="Changer de Storage ?", cursor="hand2",variable=self.changestorage_var,style="White.TCheckbutton",state="disabled",command=self.changerbase)
         self.checkbox_ChangeDB.place(x=8, y=210)
 
-        self.changebase_var = tk.IntVar(value=0)
+        # Choix pour changer de collection
+        self.changebase_var = tk.IntVar(value=0) # Stocker l'état de la chekboxe changement de collection
         self.checkbox_ChangeCollection = ttk.Checkbutton(Cadre_bouton, text="Changer de Base ?", cursor="hand2",variable=self.changebase_var,style="White.TCheckbutton",state="disabled",command=self.changercollection)
         self.checkbox_ChangeCollection.place(x=8, y=230)
 
@@ -226,39 +189,43 @@ class UserF():
         style.configure("Custom.TProgressbar", thickness=10,foreground='green', background='green')  # Épaisseur de la barre de progression
         style.layout("Custom.TProgressbar", [('Custom.Progressbar.trough', {'sticky': 'nswe', 'children': [('Custom.Progressbar.pbar', {'side': 'left', 'sticky': 'ns'})]})])
 
+        # On va créer la barre de progression
         self.progress_bar = ttk.Progressbar(zone1, orient='horizontal', length=1010, mode='determinate',style="Custom.TProgressbar")
         self.progress_bar.place(x=100,y=710)
         
 
-         #Création de nos variables
+        #Création de nos variables
         self.EltAChanger={'Id':"",'Storage':"",'Base':""}
         self.Ancien_storage=None
         self.Ancienne_bases=None
+        
         self.Client=None
+        self.db=tk.StringVar()
         #Récupération des données depuis la Storage de données locale MongoDB 
         self.Appel_loading_data()
+
         #On va centre toutes les données de ma tree view pour un meilleur affichage
-        for col in self.tree["columns"]:
+        for col in self.tree["columns"]: 
             self.tree.column(col, anchor="center")
 
         self.window.mainloop()
 
     def deselect(self):
-        self.tree.selection_remove(self.tree.selection())
-        self.lookvalue_entry.delete(0,END)
-        self.tree.update_idletasks()
+        self.tree.selection_remove(self.tree.selection()) #On supprime tous les filtres de notre tableau
+        self.lookvalue_entry.delete(0,END) # On efface le contenu de la zone de saisie recherche
+        self.tree.update_idletasks() # On raffraichit notre treeview
      
     def changerbase(self):
         
-        if self.changestorage_var.get() == 1 and self.EltAChanger['Id']!=None:
-            self.update_button.config(state="normal")
+        if self.changestorage_var.get() == 1 and self.EltAChanger['Id']!=None: # On vérifie  si la case changement de storage est oui et si un élément est sélectionné
+            self.update_button.config(state="normal") # On rend disponible le boutton mise à jour
             
-            if self.EltAChanger['Storage']=="Cloud":
-                self.Ancien_storage=self.EltAChanger['Storage'] # On sauvegarde dab la Storage d'origine
-                self.EltAChanger['Storage']= "Locale" 
-            elif self.EltAChanger['Storage']=="Locale":
-                self.Ancien_storage=self.EltAChanger['Storage'] # On sauvegarde dab la Storage d'origine
-                self.EltAChanger['Storage']="Cloud"
+            if self.EltAChanger['Storage']=="Cloud": # Si le storage initial est Cloud
+                self.Ancien_storage=self.EltAChanger['Storage'] # On sauvegarde dab la Storage d'origine dans une variable
+                self.EltAChanger['Storage']= "Locale"  # Ensuite le nom de mon nouveau storage devient Locale
+            elif self.EltAChanger['Storage']=="Locale": # Si le storage initial est Local
+                self.Ancien_storage=self.EltAChanger['Storage'] # On sauvegarde dab la Storage d'origine dans la variable Ancien_storage
+                self.EltAChanger['Storage']="Cloud" # L"ancien étant sauvegardé, on attribue la valeur Cloud à notre storage
 
         elif self.changestorage_var.get() == 0 and self.EltAChanger['Id']!=None:
             self.EltAChanger['Storage']=self.Ancien_storage
@@ -556,7 +523,8 @@ class UserF():
 
         # On actualise la barre de progression                              
         self.progress_bar.stop()
-
+        #self.Client.close()
+        
     def transfer_selected_documents(self):
 
         try:
@@ -681,8 +649,7 @@ class UserF():
                                 destination_collect = destination_client['Hypnose_documents_en_attente']
                             elif self.EltAChanger['Base']=='Hypnose_documents_validés':
                                 source_collect = source_client['Hypnose_documents_validés']
-                                destination_collect = destination_client['Hypnose_documents_validés']
-                
+                                destination_collect = destination_client['Hypnose_documents_validés']               
                 
                 
                 # Récupérer les instances de GridFS               
@@ -737,21 +704,14 @@ class UserF():
                 
                 self.changercollection()
                 self.changerbase()
-                self.Appel_loading_data()
+                #self.Appel_loading_data()
+                self.tree.update_idletasks() # On raffraichit notre treeview
                 source_client.close()
                 destination_client.close()
                 
 
         except Exception as e:
             messagebox.showerror("Connexion", f"Erreur de connexion : {e}",parent=self.window)
-
-    """ def simulate_loading(self,i):
-        self.progress_bar.start()  # Démarre la barre de progression
-        #for i in range(total):
-        time.sleep(0.1)  # Simule une tâche en cours de chargement
-        self.progress_bar['value'] = i  # Met à jour la valeur de la barre de progression
-        self.window.update_idletasks()  # Met à jour l'affichage de la fenêtre
-        self.progress_bar.stop()  # Arrête la barre de progression après la fin de la tâche """
         
     def ModifyorCreate(self):
         try:
@@ -868,9 +828,9 @@ class UserF():
                     self.tree.delete(item) 
         Client.close()
 
-if __name__ == "__main__":
-    app = UserF()
-    app.window.mainloop()
+#if __name__ == "__main__":
+    #app = UserF()
+    #app.window.mainloop()
 
 
 #if __name__ == "__main__":
